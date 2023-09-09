@@ -1,0 +1,6 @@
+// 被过滤的code
+export const RESPONSE_CODE = {
+  UAC_TIMEOUT: 4010, //登录超时
+  CONFERENCE_TIMEOUT: 107,
+  ASR_FREQUENT: 3004
+}

@@ -1,0 +1,23 @@
+{
+  "id": "3240657",
+  "name": "no name",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "36597194",
+      "name": "icon",
+      "font_class": "icon1",
+      "unicode": "e65e",
+      "unicode_decimal": 58974
+    },
+    {
+      "icon_id": "28193208",
+      "name": "电脑",
+      "font_class": "diannao",
+      "unicode": "e626",
+      "unicode_decimal": 58918
+    }
+  ]
+}

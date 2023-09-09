@@ -1,0 +1,130 @@
+// menu菜单
+.el-menu {
+  background-color: white !important;
+  border-right: none !important;
+}
+.el-menu-item-group__title {
+  display: none;
+}
+
+.el-sub-menu__title {
+  height: 24px !important;
+  &:hover {
+    background-color: transparent;
+  }
+}
+.el-sub-menu.is-active .el-sub-menu__title {
+  background-color: transparent;
+}
+
+.el-menu-item {
+  height: 40px !important;
+  color: #4e5969;
+  border-radius: 8px;
+  font-size: 13px !important;
+  a {
+    margin-right: 10px;
+    color: #4e5969;
+  }
+  span {
+    color: #4e5969;
+  }
+  &:hover {
+    background-color: #5cb1ff;
+  }
+}
+
+.el-menu-item.is-active {
+  background-color: #d2dbff !important;
+  a {
+    margin-right: 10px;
+    color: #1e4dff;
+  }
+  span {
+    color: #1e4dff;
+    font-weight: 700;
+  }
+}
+
+// 表格
+.table-header-style,
+.table-header-style th {
+  background-color: white !important;
+}
+.el-table__inner-wrapper::before {
+  background-color: transparent !important;
+}
+
+// 下拉
+.account-dropdown {
+  height: 100%;
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+// 折叠面板
+.el-collapse {
+  border: none !important;
+}
+.el-collapse-item__wrap {
+  border: none !important;
+}
+.el-collapse-item {
+  border-radius: 8px !important;
+  margin-bottom: 18px;
+}
+.el-collapse-item__header {
+  padding-left: 10px;
+  padding-right: 10px;
+  background-color: #f2f6fc !important;
+  color: #158fff !important;
+  border-bottom: none !important;
+  border-radius: 8px !important;
+}
+.el-collapse-item__content {
+  padding: 18px 0 0 0 !important;
+}
+
+// 弹窗
+.el-dialog__header,
+.el-message-box__header {
+  padding: 20px 20px 10px;
+  text-align: left;
+  .el-dialog__title {
+    font-size: 18px;
+    color: #1d2129;
+  }
+  .el-dialog__title,
+  .el-message-box__headerbtn,
+  .el-dialog__headerbtn {
+    top: 8px;
+    height: 20px;
+  }
+  .el-message-box__title {
+    font-size: 18px;
+    color: #1d2129;
+  }
+  .el-dialog__close,
+  .el-message-box__close {
+    position: relative;
+    top: 0px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 16px;
+    color: #86909c;
+    &:hover {
+      color: #c4c4c4;
+    }
+  }
+}
+
+.el-dialog {
+  border-radius: 0 !important;
+}
+.el-dialog__body {
+  padding: 24px 20px 0px;
+  .el-select {
+    width: 100%;
+  }
+}
