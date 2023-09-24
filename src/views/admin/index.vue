@@ -7,7 +7,7 @@
     </div>
     <!-- 内容 -->
     <div class="layout-content">
-      <div class="layout-content-right-title">{{ meta.title }}</div>
+      <div class="layout-content-right-title">{{ meta }}</div>
       <div class="layout-content-right-form">
         <router-view />
       </div>
@@ -23,7 +23,12 @@ const route = useRoute()
 
 // 当前路由
 const meta = computed(() => {
-  return route.meta
+  let title = route.meta.title
+  // 区分新建/编辑浏览器
+  if (route.path == '/browser_add') {
+    route.query.id ? (title = '编辑浏览器') : (title = '新建浏览器')
+  }
+  return title
 })
 </script>
 <style lang="scss" scoped>

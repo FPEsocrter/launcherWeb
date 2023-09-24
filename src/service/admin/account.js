@@ -2,21 +2,28 @@
 import zlRequest from '@/utils/http/index'
 
 export const API = {
-  ACCOUNT_LIST: '/admin/account', //列表
-  ACCOUNT_DEL: '/admin/log/batch' //删除
+  ACCOUNT_LIST: '/environment/page', //列表
+  ACCOUNT_DEL: '/environment/delete' //删除
 }
 
 /**
  * 账号管理 获取账号管理列表
  * @param {Object} params
  * @param {string} params.keyword - 关键字
- * @param {integer} params.groupId - 分组类型: 1-系统日志，2-后台管理
- * @param {integer} params.pageNo - 页码
- * @param {integer} params.pageRows - 每页显示条数
+ * @param {integer} params.currentPage - 页码
+ * @param {integer} params.pageSize - 分页的大小
  * @return {*}
  */
 export const GetAccountList = (params) => {
-  return zlRequest.get(API.ACCOUNT_LIST, params)
+  return zlRequest.post(API.ACCOUNT_LIST, {
+    keyword: params?.keyword,
+    currentPage: params?.pageNo,
+    pageSize: params?.pageSize,
+    webProxy: params?.webProxy,
+    name: params?.name,
+    remark: params?.remark,
+    area: params?.area
+  })
 }
 
 /**
@@ -25,10 +32,6 @@ export const GetAccountList = (params) => {
  * @param {integer} id - id
  * @return {*}
  */
-export const DelAccountList = (id) => {
-  return zlRequest.request('delete', API.ACCOUNT_DEL, {
-    data: {
-      accountId: id
-    }
-  })
+export const DelAccountList = (params) => {
+  return zlRequest.post(API.ACCOUNT_DEL, params)
 }

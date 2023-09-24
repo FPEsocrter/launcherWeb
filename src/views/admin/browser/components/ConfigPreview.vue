@@ -3,15 +3,16 @@
   <div class="config-preview">
     <div class="config-preview-title">
       <span>概要</span>
-      <div class="config-preview-btn">
+      <!-- <div class="config-preview-btn">
         <icon-font icon="iconfont icon-icon1" />
         <span @click="handleClick">生成新指纹</span>
-      </div>
+      </div> -->
     </div>
     <el-scrollbar>
       <div class="config-preview-row" v-for="(item, index) in definition" :key="index">
         <span class="config-preview-label">{{ item.tit }}:</span>
         <span class="config-preview-val" v-if="item.type === 'cascade'">{{ item.options[form[item.prop]] }}</span>
+        <span class="config-preview-val" v-else-if="item.type === 'select'">{{ checkLabal(proxyList, form[item.prop]) }}</span>
         <span class="config-preview-val" v-else>{{ form[item.prop] }}</span>
       </div>
       <div class="config-empty"></div>
@@ -20,8 +21,9 @@
 </template>
 <script setup>
 import mitt from '@/utils/mitt.js'
-import { identicalAssignment } from '@/utils/common'
-import { GetRandomApi } from '@/service/admin/browser'
+import { proxyList } from '@/utils/format'
+
+// import { GetRandomApi } from '@/service/admin/browser'
 
 const props = defineProps({
   formDetail: { type: Object, default: () => {} } //编辑-详情
@@ -53,16 +55,22 @@ const form = ref({
   protect: null
 })
 
+// 根据code 放回label名
+const checkLabal = (arr, val) => {
+  let find = arr.find((item) => item.value == val)
+  return find ? find.key : ''
+}
+
 // 定义表单
 const definition = ref([
   { tit: '名称', prop: 'name', type: 'input' },
   { tit: 'UserAgent', prop: 'userAgent', type: 'input', options: [] },
   { tit: 'Cookie', prop: 'cookie', type: 'textarea', options: [] },
   { tit: '备注', prop: 'meno', type: 'textarea', options: [] },
-  { tit: '代理类型', prop: 'agentType', type: 'select', options: [] },
-  { tit: '主机:端口', prop: 'port', type: 'select', options: [] },
+  { tit: '代理类型', prop: 'agentType', type: 'select', options: proxyList },
+  { tit: '主机:端口', prop: 'port', type: 'input', options: [] },
   { tit: '代理账号', prop: 'account', type: 'input', options: [] },
-  { tit: '代理密码', prop: 'password', type: 'input', options: [] },
+  // { tit: '代理密码', prop: 'password', type: 'input', options: [] },
   { tit: '时区', prop: 'time', type: 'cascade', options: ['默认', '关闭'] },
   { tit: 'webRTC', prop: 'webRTC', type: 'cascade', options: ['默认', '关闭'] },
   { tit: '地理位置', prop: 'location', type: 'cascade', options: ['默认', '禁止'] },
@@ -80,13 +88,13 @@ const definition = ref([
   { tit: '端口保护', prop: 'protect', type: 'cascade', options: ['关闭'] }
 ])
 
-// 生成新指纹
-const handleClick = () => {
-  form.value.name = '随机001'
-  GetRandomApi().then((res) => {
-    console.log(res)
-  })
-}
+// // 生成新指纹
+// const handleClick = () => {
+//   form.value.name = '随机001'
+//   GetRandomApi().then((res) => {
+//     console.log(res)
+//   })
+// }
 
 // 监听表单变化 实时更新
 mitt.on('formChange', (data) => {
@@ -103,8 +111,9 @@ watch(
   () => props.formDetail,
   (newValue) => {
     if (newValue) {
+      console.log(newValue)
       // 合并、回填 表单
-      identicalAssignment(form.value, newValue)
+      // identicalAssignment(form.value, newValue)
     }
   }
 )

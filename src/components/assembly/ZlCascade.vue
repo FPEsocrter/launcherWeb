@@ -12,7 +12,7 @@
       <span
         @click="handleChange(index)"
         :class="{
-          'active-btn': current === index
+          'active-btn': current == index
         }"
         v-for="(op, index) in it.options"
         :key="index"
@@ -44,6 +44,7 @@ watch(
   (newValue) => {
     val.value = newValue[0]
     it.value = newValue[1]
+    current.value = newValue[0]
   }
 )
 

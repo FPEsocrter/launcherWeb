@@ -3,17 +3,17 @@
   <div class="account-content">
     <!-- 1.搜索 -->
     <div class="account-search">
-      <el-input
-        :prefix-icon="Search"
-        v-model="searchForm.keyword"
-        class="input-with-select"
-        clearable
-        placeholder="搜索"
-        style="width: 280px"
-        @clear="handleSearch"
-        @keydown.enter="handleSearch"
-        @blur="handleSearch"
-      />
+      <div class="account-search-left">
+        <el-select v-model="searchForm.webProxy" clearable placeholder="代理类型" style="width: 110px">
+          <el-option v-for="item in proxyList" :key="item.key" :label="item.key" :value="item.value" />
+        </el-select>
+        <el-input :prefix-icon="Search" v-model="searchForm.name" class="input-with-select" clearable placeholder="请输入环境名称" style="width: 160px" />
+        <el-input :prefix-icon="Search" v-model="searchForm.remark" class="input-with-select" clearable placeholder="请输入环境备注" style="width: 160px" />
+        <el-input :prefix-icon="Search" v-model="searchForm.area" class="input-with-select" clearable placeholder="请输入环境区域" style="width: 160px" />
+      </div>
+      <div class="account-search-right">
+        <el-button size="default" type="primary" @click="handleSearch">查询</el-button>
+      </div>
     </div>
     <!-- 2.表格 -->
     <div class="account-table">
@@ -51,15 +51,19 @@ import HsButton from '@/components/assembly/HsButton.vue'
 import paginationVue from '@/components/business/pagination.vue'
 import { GetAccountList, DelAccountList } from '@/service/admin/account'
 import { onMounted } from 'vue'
-import { prePrecessDateAll } from '@/utils/common'
+import { prePrecessDateAll, openMessageBox } from '@/utils/common'
 import { useRouter } from 'vue-router'
 import FixAgentDialog from './components/FixAgentDialog.vue'
 import FixPrintDialog from './components/FixPrintDialog.vue'
+import { proxyList } from '@/utils/format'
 
 const router = useRouter()
 
 const searchForm = ref({
-  keyword: null
+  remark: null,
+  name: null,
+  area: null,
+  webProxy: null
 })
 
 // 是否显示 修改代理 弹窗
@@ -77,29 +81,14 @@ const handleSearch = () => {
 const selectList = ref([])
 
 // 用户列表
-const userList = ref([
-  {
-    id: 1,
-    name: 'abc',
-    name1: '哈哈',
-    ip: '192.168.12.0',
-    history: '2023-08-27'
-  },
-  {
-    id: 2,
-    name: 'abc',
-    name1: '哈哈',
-    ip: '192.168.12.0',
-    history: '2023-08-27'
-  }
-])
+const userList = ref([])
 
 // 表格 列
 const columns = ref([
   { prop: 'name', label: '名称', width: '140' },
-  { prop: 'name1', label: '备注', width: '200' },
-  { prop: 'ip', label: 'ip', width: '200' },
-  { prop: 'history', label: '最近打开', width: '220' },
+  { prop: 'remark', label: '备注', width: '200' },
+  { prop: 'lastUseIp', label: 'ip', width: '200' },
+  { prop: 'lastOpenTime', label: '最近打开', width: '220' },
   { prop: 'custom', label: '打开', width: '110', fixed: 'right' },
   { prop: 'option', label: '操作', width: '80', fixed: 'right' }
 ])
@@ -111,7 +100,9 @@ const paginationForm = ref({
 })
 
 // 接口获取的分页信息
-const pageInfo = ref({})
+const pageInfo = ref({
+  total: null
+})
 
 // 按钮定义
 const definitionBtn = { text: '打开', type: 'primary', size: 'small' }
@@ -136,9 +127,8 @@ const handleCommand = (command) => {
       break
     // 删除
     case 'delete':
-      DelAccountList(clikeRow.value.id).then((res) => {
-        console.log(res)
-      })
+      handleDel()
+
       break
     // 修改代理
     case 'fixAgent':
@@ -160,10 +150,31 @@ const handleOpen = (row) => {
 const getList = () => {
   // 合并分页、搜索
   let postForm = prePrecessDateAll(Object.assign(searchForm.value, paginationForm.value))
-  GetAccountList(postForm).then((res) => {
-    console.log(res)
+  GetAccountList(postForm).then(({ data: res }) => {
+    pageInfo.value.total = res.total
+    userList.value = res.list
   })
 }
+
+// 根据id删除
+const handleDel = () => {
+  DelAccountList({ id: clikeRow.value.id }).then(({ data: res }) => {
+    if (res) {
+      getList()
+      openMessageBox('删除成功', 'success')
+    } else {
+      openMessageBox('删除失败', 'error')
+    }
+  })
+}
+
+// 监听页码变化
+watch(
+  () => paginationForm.value.pageNo,
+  () => {
+    getList()
+  }
+)
 
 onMounted(() => {
   getList()
@@ -178,8 +189,9 @@ onMounted(() => {
     padding: 10px 10px;
     border-radius: 8px;
     display: flex;
+    justify-content: space-between;
     // 筛选控件
-    > div {
+    .account-search-left > div {
       padding-right: 16px;
     }
   }

@@ -17,7 +17,7 @@
   </el-dialog>
 </template>
 <script setup>
-import { PutAgentApi } from '@/service/admin/browser'
+import { GetAgentApi } from '@/service/admin/browser'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: true }, //是否显示弹窗
@@ -53,7 +53,7 @@ const definition = ref([
 
 // 查询
 const getDetail = (id) => {
-  PutAgentApi({ id: id }).then((res) => {
+  GetAgentApi({ id: id }).then((res) => {
     console.log(res)
   })
 }

@@ -19,7 +19,7 @@
   </el-dialog>
 </template>
 <script setup>
-import { PutPrintApi } from '@/service/admin/browser'
+import { GetPrintApi } from '@/service/admin/browser'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: true }, //是否显示弹窗
@@ -77,7 +77,7 @@ const definition = ref([
 
 // 查询
 const getDetail = (id) => {
-  PutPrintApi({ id: id }).then((res) => {
+  GetPrintApi({ id: id }).then((res) => {
     console.log(res)
   })
 }

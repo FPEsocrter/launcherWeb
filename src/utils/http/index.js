@@ -12,10 +12,10 @@ import router from '@/router'
 //   return useStore('auth')
 // })
 
-const LoadingInstance = {
-  _target: null,
-  _count: 0
-}
+// const LoadingInstance = {
+//   _target: null,
+//   _count: 0
+// }
 export class Http {
   constructor(baseURL = BASE_URL, customOptions) {
     this.custom_options = Object.assign(
@@ -72,14 +72,14 @@ export class Http {
     // 响应拦截器
     this.instance.interceptors.response.use(
       (response) => {
-        this.custom_options.loading && closeLoading(this.custom_options)
+        // this.custom_options.loading && closeLoading(this.custom_options)
 
         if (this.custom_options.code_message_show && response.data) {
           // 登录超时
           if (response.data.code === RESPONSE_CODE.UAC_TIMEOUT) {
             // auth.value.logoutAction()
             return Promise.reject(response.data)
-          } else if (response.data.code !== 0) {
+          } else if (response.data.statusCode !== 200) {
             openMessageBox(response.data.msg, 'error')
             return Promise.reject(response.data)
           }
@@ -121,15 +121,15 @@ export class Http {
   }
 }
 
-function closeLoading(options) {
-  if (options.loading && LoadingInstance._count > 0) {
-    LoadingInstance._count--
-  }
-  if (LoadingInstance._count === 0) {
-    LoadingInstance._target.close()
-    LoadingInstance._target = null
-  }
-}
+// function closeLoading(options) {
+//   if (options.loading && LoadingInstance._count > 0) {
+//     LoadingInstance._count--
+//   }
+//   if (LoadingInstance._count === 0) {
+//     LoadingInstance._target.close()
+//     LoadingInstance._target = null
+//   }
+// }
 
 function errTip(error, msg = '未知错误') {
   const tip = {

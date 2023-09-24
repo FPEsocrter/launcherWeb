@@ -3,7 +3,7 @@
   <div class="browser-content">
     <div class="browser-title">导入配置</div>
     <div class="browser-config">
-      <config-form ref="formRef" :formDetail="formDetail" />
+      <config-form ref="formRef" :formDetail="formDetail" :isEdit="route.query.id" />
     </div>
     <div class="browser-bottom">
       <hs-button :item="definitionBtn[0]" @click-btn="handleSubmit" />
@@ -19,7 +19,8 @@ import HsButton from '@/components/assembly/HsButton.vue'
 import ConfigForm from './components/ConfigForm.vue'
 import ConfigPreview from './components/ConfigPreview.vue'
 import { useRouter, useRoute } from 'vue-router'
-import { AddBrowserApi, GetBrowserApi } from '@/service/admin/browser'
+import { AddBrowserApi, GetBrowserApi, FixBrowserApi } from '@/service/admin/browser'
+import { openMessageBox } from '@/utils/common'
 
 const router = useRouter()
 const route = useRoute()
@@ -31,11 +32,124 @@ const definitionBtn = [{ text: '确定', type: 'primary' }, { text: '取消' }]
 
 // 提交配置表单
 const handleSubmit = () => {
-  console.log('表单值：')
-  console.log(formRef.value.form)
-  AddBrowserApi(formRef.value.form).then(({ data: res }) => {
-    console.log(res)
-  })
+  const configForm = formRef.value.form
+  let postForm = {
+    environment: {
+      name: configForm.name,
+      remark: configForm.meno
+    },
+    webProxy: {
+      type: configForm.agentType,
+      host: configForm.port,
+      port: 0,
+      account: configForm.account,
+      password: configForm.password,
+      other: {}
+    },
+    fingerprint: {
+      userAgent: configForm.userAgent,
+      timeZone: {
+        type: configForm.time,
+        timeZone: ''
+      },
+      webRTC: configForm.webRTC,
+      location: {
+        type: configForm.location,
+        latitude: 0,
+        longitude: 0,
+        accuracy: 0
+      },
+      language: {
+        type: configForm.language
+        // languages: []
+      },
+      resolution: {
+        type: configForm.resolution
+        // windowWidth: 0,
+        // windowHeight: 0
+      },
+      font: {
+        type: configForm.font
+        // fontList: []
+      },
+      canvas: configForm.canvas,
+      webGL: configForm.webGL,
+      gupGL: configForm.gupGL,
+      webGLDevice: {
+        type: configForm.webGL
+        // vendors: '',
+        // renderer: ''
+      },
+      audioContext: configForm.audioContext,
+      mediaEquipment: {
+        type: configForm.media
+        // microphone: 0,
+        // speaker: 0,
+        // videoCamera: 0
+      },
+      clientRects: configForm.clientRects,
+      speechVoices: configForm.speechVoices,
+      resourceInfo: {
+        type: configForm.resourceInfo
+        // cpu: 0,
+        // memory: 0
+      },
+      doNotTrack: configForm.track,
+      openPort: {
+        type: configForm.protect
+        // list: []
+      }
+    },
+    chromiumData: {
+      // cookie: configForm.cookie
+      cookie: {}
+    }
+  }
+
+  // 是否为 编辑
+  if (route.query.id) {
+    // 编辑
+    postForm['id'] = Number(route.query.id)
+    FixBrowserApi(postForm).then((res) => {
+      if (res.statusCode == 200) {
+        clearForm()
+        openMessageBox('添加成功', 'success')
+      } else {
+        openMessageBox(res.message, 'error')
+      }
+    })
+  } else {
+    // 新增
+    AddBrowserApi(postForm).then((res) => {
+      if (res.statusCode == 200) {
+        clearForm()
+        openMessageBox('添加成功', 'success')
+      } else {
+        openMessageBox(res.message, 'error')
+      }
+    })
+  }
+}
+
+// 清空表单
+const clearForm = () => {
+  formRef.value.formRefs.resetFields()
+  formRef.value.form.time = 0
+  formRef.value.form.webRTC = 0
+  formRef.value.form.location = 0
+  formRef.value.form.language = 0
+  formRef.value.form.resolution = 0
+  formRef.value.form.font = 0
+  formRef.value.form.canvas = 0
+  formRef.value.form.webGL = 0
+  formRef.value.form.metadata = 0
+  formRef.value.form.audioContext = 0
+  formRef.value.form.media = 0
+  formRef.value.form.clientRects = 0
+  formRef.value.form.speechVoices = 0
+  formRef.value.form.resourceInfo = 0
+  formRef.value.form.track = 0
+  formRef.value.form.protect = 0
 }
 
 // 返回上一级
@@ -48,13 +162,8 @@ const formDetail = ref({})
 
 // 获取详情->回填表单以及概要
 const getDetail = (id) => {
-  // 假数据
-  formDetail.value = {
-    cookie: '这是cookie',
-    memo: '这是备注'
-  }
-  GetBrowserApi({ id: id }).then((res) => {
-    console.log(res)
+  GetBrowserApi({ id: id }).then(({ data: res }) => {
+    formDetail.value = res
   })
 }
 

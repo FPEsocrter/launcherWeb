@@ -3,9 +3,11 @@ import zlRequest from '@/utils/http/index'
 
 export const API = {
   RANDOM_GET: '/random', //生成新指纹
-  BROWSER_ADD: '/browser', //列表
-  AGENT_FIX: '/agent', //代理
-  PRINT_FIX: '/print' //指纹
+  BROWSER_ADD: '/environment/add', //新增环境
+  BROWSER_FIX: '/environment/modify', //修改环境
+  BROWSER_ADD_SINGLE: '/environment/get', //查询单个环境详情
+  AGENT_FIX: '/environment/get', //代理
+  PRINT_FIX: '/environment/get' //指纹
 }
 
 /**
@@ -18,13 +20,28 @@ export const AddBrowserApi = (params) => {
 }
 
 /**
+ * 编辑浏览器
+ * @param {Object} params
+ * @return {*}
+ */
+export const FixBrowserApi = (params) => {
+  return zlRequest.post(API.BROWSER_FIX, params)
+}
+
+/**
  * 查询详情
  * @param {Object} params
  * @param {Object} params.id
  * @return {*}
  */
 export const GetBrowserApi = (params) => {
-  return zlRequest.get(API.BROWSER_ADD, params)
+  return zlRequest.post(API.BROWSER_ADD_SINGLE, {
+    id: params.id,
+    environment: true,
+    webProxy: true,
+    fingerprint: true,
+    chromiumData: true
+  })
 }
 
 /**
@@ -41,9 +58,12 @@ export const GetRandomApi = () => {
  * @param {Object} params
  * @return {*}
  */
-export const PutAgentApi = (params) => {
-  return zlRequest.request('put', API.AGENT_FIX, {
-    data: params
+export const GetAgentApi = (params) => {
+  return zlRequest.post(API.AGENT_FIX, {
+    id: params.id,
+    environment: true,
+    fingerprint: true,
+    chromiumData: true
   })
 }
 
@@ -52,8 +72,9 @@ export const PutAgentApi = (params) => {
  * @param {Object} params
  * @return {*}
  */
-export const PutPrintApi = (params) => {
-  return zlRequest.request('put', API.PRINT_FIX, {
-    data: params
+export const GetPrintApi = (params) => {
+  return zlRequest.post(API.PRINT_FIX, {
+    id: params.id,
+    fingerprint: true
   })
 }
