@@ -13,12 +13,12 @@
       <el-menu class="el-menu-vertical" router :default-active="active" @close="handleClose" @open="handleOpen">
         <el-sub-menu index="common">
           <template #title>
-            <icon-font icon="icon-icon1" />
+            <icon-font icon="icon-shouye" />
             <span class="menu-sub-title">常用</span>
           </template>
           <el-menu-item-group>
             <el-menu-item index="account_manage">
-              <icon-font icon="icon-icon1" />
+              <icon-font icon="icon-fuwuguanli" />
               <span>环境管理</span>
             </el-menu-item>
             <!-- <el-menu-item index="browser_add">

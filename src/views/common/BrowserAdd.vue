@@ -1,7 +1,7 @@
 <!-- 新建浏览器-按钮 -->
 <template>
   <div class="add-content" :class="{ 'disable-css': isDisable }" @click="handleClick">
-    <icon-font icon="icon-icon1" />
+    <icon-font icon="icon-xinzeng" />
     <span>新建浏览器</span>
   </div>
 </template>
