@@ -40,8 +40,8 @@
       </table-vue>
       <pagination-vue v-model="paginationForm.pageNo" :size="paginationForm.pageSize" :total="pageInfo.total" />
     </div>
-    <fix-agent-dialog v-model="isAgent" :row="clikeRow" />
-    <fix-print-dialog v-model="isPrint" :row="clikeRow" />
+    <fix-agent-dialog v-model="isAgent" :row="clikeRow" @update-list="getList" />
+    <fix-print-dialog v-model="isPrint" :row="clikeRow" @update-list="getList" />
   </div>
 </template>
 <script setup>

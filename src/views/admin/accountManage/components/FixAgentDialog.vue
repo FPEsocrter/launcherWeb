@@ -17,14 +17,17 @@
   </el-dialog>
 </template>
 <script setup>
-import { GetAgentApi } from '@/service/admin/browser'
+import { GetAgentApi, FixBrowserApi } from '@/service/admin/browser'
+import { openMessageBox } from '@/utils/common'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: true }, //是否显示弹窗
   row: { type: Object, default: () => {} } //当前点击的行
 })
 
-const emit = defineEmits(['update:modelValue'])
+const formRef = ref(null)
+
+const emit = defineEmits(['update:modelValue', 'update-list'])
 
 // 是否显示弹窗
 const isShow = computed({
@@ -37,10 +40,10 @@ const isShow = computed({
 })
 
 const form = ref({
-  name: null,
-  userAgent: null,
+  name: '',
+  userAgent: '',
   cookie: null,
-  meno: null
+  meno: ''
 })
 
 // 定义表单
@@ -51,17 +54,49 @@ const definition = ref([
   { tit: '备注', prop: 'meno', type: 'textarea', options: [] }
 ])
 
+// 查询到的指纹详情
+const detail = ref(null)
+
 // 查询
 const getDetail = (id) => {
   GetAgentApi({ id: id }).then((res) => {
-    console.log(res)
+    if (res.statusCode == 200) {
+      detail.value = res.data
+      form.value.name = res.data?.environment?.name
+      form.value.meno = res.data?.environment?.meno
+      form.value.userAgent = res.data?.fingerprint?.userAgent
+      form.value.cookie = res.data?.chromiumData?.cookie
+    }
   })
 }
 
 // 提交修改
 const confirmFix = () => {
-  console.log(form.value)
-  isShow.value = false
+  let postForm = {
+    environment: {
+      name: form.value.name,
+      remark: form.value.meno
+    },
+    fingerprint: detail.value?.fingerprint,
+    chromiumData: {
+      cookie: {}
+    }
+  }
+  postForm['id'] = Number(detail.value?.id)
+  postForm.fingerprint.userAgent = form.value.userAgent
+
+  // 发起修改请求
+  FixBrowserApi(postForm).then((res) => {
+    if (res.statusCode == 200) {
+      formRef.value.resetFields()
+      openMessageBox('修改成功', 'success')
+      isShow.value = false
+      // 更新列表
+      emit('update-list')
+    } else {
+      openMessageBox(res.message, 'error')
+    }
+  })
 }
 
 // 取消

@@ -9,12 +9,12 @@ import { message } from './resetMessage'
 // 引用http的没有加 请求拦截
 // import http from 'axios'
 
-import { BASE_URL, VPR_URL } from '@/environment'
+import { BASE_URL } from '@/environment'
 
 // import storageLocal from '@/utils/storage'
 
 export const HREF_URL = BASE_URL
-export const VOICE_URL = VPR_URL
+// export const VOICE_URL = VPR_URL
 
 /**
  *  字典类型查询字典列表

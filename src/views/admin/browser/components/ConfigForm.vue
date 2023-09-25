@@ -43,6 +43,7 @@ const props = defineProps({
 const formRefs = ref(null)
 
 const formRules = ref([])
+
 const form = ref({
   name: null, //环境名称
   userAgent: null,
@@ -60,6 +61,7 @@ const form = ref({
   font: 0, //字体
   canvas: 0,
   webGL: 0,
+  gupGL: 0,
   metadata: 0, //元数据
   audioContext: 0, //
   media: 0, //媒体设备
@@ -142,7 +144,7 @@ watch(
         location: newVal?.fingerprint?.location?.type,
         language: newVal?.fingerprint?.language?.type,
         resolution: newVal?.fingerprint?.resolution?.type,
-        font: newVal?.fingerprint?.resolution?.font,
+        font: newVal?.fingerprint?.font?.type,
         canvas: newVal?.fingerprint?.canvas,
         webGL: newVal?.fingerprint?.webGL,
         gupGL: newVal?.fingerprint?.gupGL,

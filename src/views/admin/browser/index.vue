@@ -108,12 +108,14 @@ const handleSubmit = () => {
 
   // 是否为 编辑
   if (route.query.id) {
+    console.log(postForm, configForm)
     // 编辑
     postForm['id'] = Number(route.query.id)
     FixBrowserApi(postForm).then((res) => {
       if (res.statusCode == 200) {
-        clearForm()
-        openMessageBox('添加成功', 'success')
+        // 编辑不清空
+        // clearForm()
+        openMessageBox('修改成功', 'success')
       } else {
         openMessageBox(res.message, 'error')
       }

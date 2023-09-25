@@ -19,14 +19,17 @@
   </el-dialog>
 </template>
 <script setup>
-import { GetPrintApi } from '@/service/admin/browser'
+import { GetPrintApi, FixBrowserApi } from '@/service/admin/browser'
+import { openMessageBox } from '@/utils/common'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: true }, //是否显示弹窗
   row: { type: Object, default: () => {} } //当前点击的行
 })
 
-const emit = defineEmits(['update:modelValue'])
+const formRef = ref(null)
+
+const emit = defineEmits(['update:modelValue', 'update-list'])
 
 // 是否显示弹窗
 const isShow = computed({
@@ -39,6 +42,7 @@ const isShow = computed({
 })
 
 const form = ref({
+  userAgent: null,
   time: null,
   webRTC: null,
   location: null,
@@ -47,6 +51,7 @@ const form = ref({
   font: null,
   canvas: null,
   webGL: null,
+  gupGL: null,
   metadata: null,
   audioContext: null,
   media: null,
@@ -75,15 +80,109 @@ const definition = ref([
   { tit: '端口保护', prop: 'protect', type: 'cascade', options: ['关闭'] }
 ])
 
+// 查询到的指纹详情
+const detail = ref(null)
+
 // 查询
 const getDetail = (id) => {
   GetPrintApi({ id: id }).then((res) => {
-    console.log(res)
+    if (res.statusCode == 200) {
+      detail.value = res.data
+      form.value.userAgent = res.data?.fingerprint?.userAgent
+      form.value.time = res.data?.fingerprint?.timeZone?.type
+      form.value.webRTC = res.data?.fingerprint?.webRTC
+      form.value.location = res.data?.fingerprint?.location?.type
+      form.value.language = res.data?.fingerprint?.language?.type
+      form.value.resolution = res.data?.fingerprint?.resolution?.type
+      form.value.font = res.data?.fingerprint?.font?.type
+      form.value.canvas = res.data?.fingerprint?.canvas
+      form.value.webGL = res.data?.fingerprint?.webGL
+      form.value.gupGL = res.data?.fingerprint?.gupGL
+      form.value.metadata = res.data?.fingerprint?.webGLDevice?.type
+      form.value.audioContext = res.data?.fingerprint?.audioContext
+      form.value.media = res.data?.fingerprint?.mediaEquipment?.type
+      form.value.clientRects = res.data?.fingerprint?.clientRects
+      form.value.speechVoices = res.data?.fingerprint?.speechVoices
+      form.value.resourceInfo = res.data?.fingerprint?.resourceInfo?.type
+      form.value.track = res.data?.fingerprint?.doNotTrack
+      form.value.protect = res.data?.fingerprint?.openPort?.type
+    }
   })
 }
 
 // 提交修改
 const confirmFix = () => {
+  let postForm = {
+    fingerprint: {
+      userAgent: form.value.userAgent,
+      timeZone: {
+        type: form.value.time,
+        timeZone: ''
+      },
+      webRTC: form.value.webRTC,
+      location: {
+        type: form.value.location,
+        latitude: 0,
+        longitude: 0,
+        accuracy: 0
+      },
+      language: {
+        type: form.value.language
+        // languages: []
+      },
+      resolution: {
+        type: form.value.resolution
+        // windowWidth: 0,
+        // windowHeight: 0
+      },
+      font: {
+        type: form.value.font
+        // fontList: []
+      },
+      canvas: form.value.canvas,
+      webGL: form.value.webGL,
+      gupGL: form.value.gupGL,
+      webGLDevice: {
+        type: form.value.webGL
+        // vendors: '',
+        // renderer: ''
+      },
+      audioContext: form.value.audioContext,
+      mediaEquipment: {
+        type: form.value.media
+        // microphone: 0,
+        // speaker: 0,
+        // videoCamera: 0
+      },
+      clientRects: form.value.clientRects,
+      speechVoices: form.value.speechVoices,
+      resourceInfo: {
+        type: form.value.resourceInfo
+        // cpu: 0,
+        // memory: 0
+      },
+      doNotTrack: form.value.track,
+      openPort: {
+        type: form.value.protect
+        // list: []
+      }
+    }
+  }
+
+  postForm['id'] = Number(detail.value?.id)
+
+  // 发起修改请求
+  FixBrowserApi(postForm).then((res) => {
+    if (res.statusCode == 200) {
+      formRef.value.resetFields()
+      openMessageBox('修改成功', 'success')
+      isShow.value = false
+      // 更新列表
+      emit('update-list')
+    } else {
+      openMessageBox(res.message, 'error')
+    }
+  })
   console.log(form.value)
   isShow.value = false
 }
