@@ -40,8 +40,8 @@ const handleSubmit = () => {
     },
     webProxy: {
       type: configForm.agentType,
-      host: configForm.port,
-      port: 0,
+      host: configForm.host,
+      port: configForm.port,
       account: configForm.account,
       password: configForm.password,
       other: {}
@@ -125,6 +125,8 @@ const handleSubmit = () => {
     AddBrowserApi(postForm).then((res) => {
       if (res.statusCode == 200) {
         clearForm()
+        // 不显示ip信息
+        formRef.value.isShowIp = false
         openMessageBox('添加成功', 'success')
       } else {
         openMessageBox(res.message, 'error')

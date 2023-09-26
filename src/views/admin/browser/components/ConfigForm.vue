@@ -14,7 +14,46 @@
               <template v-for="(item, index) in definitionAgent" :key="index">
                 <hs-input v-if="item.type === 'input' || item.type === 'textarea'" v-model.trim="form[item.prop]" :item="item" />
                 <hs-select v-else-if="item.type === 'select'" v-model="form[item.prop]" :close-key="visible" :item="item" />
+                <!-- 代理类型 -->
+                <template v-else-if="item.type === 'checkSelect'">
+                  <div class="config-check">
+                    <hs-select v-model="form[item.prop]" :close-key="visible" :item="item" />
+                    <div class="config-check-btn" @click="handleCheck">检查网络</div>
+                  </div>
+                </template>
+                <!-- 代理端口 -->
+                <template v-else-if="item.type === 'checkInput'">
+                  <div class="config-check-port">
+                    <el-form-item :label="item.tit" :prop="item.prop" :rules="item.rules ? it.rules : ''">
+                      <el-input
+                        v-model.trim="form[item.prop]"
+                        :disabled="item.disabled ? item.disabled : false"
+                        :placeholder="'请输入主机地址'"
+                        :show-password="item.inputType ? true : false"
+                        :type="item.type ? item.type : ''"
+                      >
+                        <template #append>
+                          :
+                          <el-input
+                            v-model.trim="form.port"
+                            :disabled="item.disabled ? item.disabled : false"
+                            :placeholder="'端口'"
+                            :show-password="item.inputType ? true : false"
+                            :type="item.type ? item.type : ''"
+                            @input="handleInput"
+                          />
+                        </template>
+                      </el-input>
+                    </el-form-item>
+                  </div>
+                </template>
               </template>
+              <div class="config-check-text" v-if="isShowIp">
+                <p v-if="ipForm?.ips.length">IP：{{ ipForm?.ips.join(',') }}</p>
+                <p v-if="ipForm?.countryCode">国家/地区：{{ ipForm.countryCode }}</p>
+                <p v-if="ipForm?.region">州/省：{{ ipForm.region }}</p>
+                <p v-if="ipForm?.city">城市：{{ ipForm.city }}</p>
+              </div>
             </div>
           </el-collapse-item>
           <el-collapse-item title="高级" name="2">
@@ -33,6 +72,9 @@
 <script setup>
 import mitt from '@/utils/mitt.js'
 // import { identicalAssignment } from '@/utils/common'
+import { CheckNetWordkApi } from '@/service/admin/browser'
+import { prePrecessDateAll } from '@/utils/common'
+
 import { proxyList } from '@/utils/format'
 import { onMounted } from 'vue'
 const props = defineProps({
@@ -47,9 +89,10 @@ const formRules = ref([])
 const form = ref({
   name: null, //环境名称
   userAgent: null,
-  cookie: null,
+  // cookie: null,
   meno: null, //环境备注
   agentType: null, //代理类型
+  host: null, //主机
   port: null, //端口
   account: null, //账号
   password: null, //密码
@@ -72,18 +115,29 @@ const form = ref({
   protect: 0 //端口保护
 })
 
+// 是否显示ip信息
+const isShowIp = ref(false)
+
+// 点击检查 获取的ips
+const ipForm = ref({
+  ips: ['ip1', 'ip2'],
+  city: '杭州',
+  region: '浙江',
+  countryCode: 'cn'
+})
+
 // 定义表单
 const definition = ref([
   { tit: '名称', prop: 'name', type: 'input' },
   { tit: 'UserAgent', prop: 'userAgent', type: 'input', options: [] },
-  { tit: 'Cookie', prop: 'cookie', type: 'textarea', options: [] },
+  // { tit: 'Cookie', prop: 'cookie', type: 'textarea', options: [] },
   { tit: '备注', prop: 'meno', type: 'textarea', options: [] }
 ])
 
 // 代理
 const definitionAgent = ref([
-  { tit: '代理类型', prop: 'agentType', type: 'select', options: proxyList },
-  { tit: '主机:端口', prop: 'port', type: 'input', options: [] },
+  { tit: '代理类型', prop: 'agentType', type: 'checkSelect', options: proxyList },
+  { tit: '主机:端口', prop: 'host', type: 'checkInput', options: [] },
   { tit: '代理账号', prop: 'account', type: 'input', options: [] },
   { tit: '代理密码', prop: 'password', type: 'input', inputType: true, options: [] }
 ])
@@ -112,6 +166,31 @@ const definitionSenior = ref([
 // 折叠面板key
 const activeNames = ref(null)
 
+// 检查网络
+const handleCheck = () => {
+  let postForm = {
+    type: form.value.agentType,
+    host: form.value.host,
+    port: form.value.port
+  }
+  // 代理类型不选 不发起请求
+  if (postForm?.type != undefined && postForm?.type != null) {
+    CheckNetWordkApi(prePrecessDateAll(postForm)).then((res) => {
+      if (res.statusCode == 200) {
+        isShowIp.value = true
+        ipForm.value = res.data
+      } else {
+        isShowIp.value = false
+      }
+    })
+  }
+}
+
+// 端口 只允许输入数字
+const handleInput = (event) => {
+  form.value.port = Number(event.replace(/\D/g, ''))
+}
+
 // 监听浏览器表单
 watch(
   form.value,
@@ -133,10 +212,11 @@ watch(
       form.value = {
         name: newVal?.environment?.name,
         userAgent: newVal?.fingerprint?.userAgent,
-        cookie: newVal?.chromiumData?.cookie,
+        // cookie: newVal?.chromiumData?.cookie,
         meno: newVal.environment?.remark,
         agentType: newVal?.webProxy?.type,
         port: newVal?.webProxy?.post,
+        host: newVal?.webProxy?.host,
         account: newVal?.webProxy?.account,
         password: newVal?.webProxy?.password,
         time: newVal?.fingerprint?.timeZone?.type,
@@ -172,7 +252,8 @@ onMounted(() => {
 
 defineExpose({
   form,
-  formRefs
+  formRefs,
+  isShowIp
 })
 </script>
 
@@ -188,6 +269,48 @@ defineExpose({
   }
   .config-empty {
     height: 60px;
+  }
+}
+
+.config-check,
+.config-check-port {
+  position: relative;
+  .config-check-btn {
+    cursor: pointer;
+    height: 30px;
+    line-height: 30px;
+    top: 1px;
+    right: -130px;
+    position: absolute;
+    width: 65px;
+    border-radius: 6px;
+    text-align: center;
+    color: #1e4dff;
+    border: 1px solid #1e4dff;
+  }
+}
+
+:deep(.config-check-port) {
+  // 端口
+  .el-input__wrapper {
+    box-shadow: none;
+  }
+  .el-input-group__append {
+    padding: 0;
+    box-shadow: none;
+    background-color: transparent;
+  }
+  .el-form-item__content {
+    border: 1px solid #dadce2;
+    border-radius: 3px;
+  }
+}
+
+.config-check-text {
+  padding-left: 150px;
+  color: rgb(124, 201, 10);
+  p {
+    height: 18px;
   }
 }
 </style>

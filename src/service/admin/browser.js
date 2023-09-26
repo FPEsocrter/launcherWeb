@@ -7,7 +7,8 @@ export const API = {
   BROWSER_FIX: '/environment/modify', //修改环境
   BROWSER_ADD_SINGLE: '/environment/get', //查询单个环境详情
   AGENT_FIX: '/environment/get', //代理
-  PRINT_FIX: '/environment/get' //指纹
+  PRINT_FIX: '/environment/get', //指纹
+  CHECK_NETWORK: '/webProxy/detection' //检查代理
 }
 
 /**
@@ -77,4 +78,13 @@ export const GetPrintApi = (params) => {
     id: params.id,
     fingerprint: true
   })
+}
+
+/**
+ * 检查网络
+ * @param {Object} params
+ * @return {*}
+ */
+export const CheckNetWordkApi = (params) => {
+  return zlRequest.post(API.CHECK_NETWORK, params)
 }

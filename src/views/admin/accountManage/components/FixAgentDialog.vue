@@ -42,7 +42,7 @@ const isShow = computed({
 const form = ref({
   name: '',
   userAgent: '',
-  cookie: null,
+  // cookie: null,
   meno: ''
 })
 
@@ -50,7 +50,7 @@ const form = ref({
 const definition = ref([
   { tit: '名称', prop: 'name', type: 'input' },
   { tit: 'UserAgent', prop: 'userAgent', type: 'input', options: [] },
-  { tit: 'Cookie', prop: 'cookie', type: 'textarea', options: [] },
+  // { tit: 'Cookie', prop: 'cookie', type: 'textarea', options: [] },
   { tit: '备注', prop: 'meno', type: 'textarea', options: [] }
 ])
 
@@ -65,7 +65,7 @@ const getDetail = (id) => {
       form.value.name = res.data?.environment?.name
       form.value.meno = res.data?.environment?.meno
       form.value.userAgent = res.data?.fingerprint?.userAgent
-      form.value.cookie = res.data?.chromiumData?.cookie
+      // form.value.cookie = res.data?.chromiumData?.cookie
     }
   })
 }
