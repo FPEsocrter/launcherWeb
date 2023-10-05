@@ -41,23 +41,14 @@ import Fingerprint from './components/Fingerprint.vue'
 import BrowserSynopsis from './components/BrowserSynopsis.vue'
 import { useRouter, useRoute } from 'vue-router'
 import { AddBrowserApi, GetBrowserApi, FixBrowserApi } from '@/service/admin/browser'
-const props = defineProps({
-  modelValue: {
-    type: Object,
-    default: () => {}
-  },
-  id: {
-    type: Number,
-    default: 0
-  }
-})
+FixBrowserApi
+const route = useRoute()
+const id = ref(route.query.id)
+
 const refEnvironment = ref('refEnvironment')
 const refWebProxy = ref('refWebProxy')
 const refFingerprint = ref('refFingerprint')
 const router = useRouter()
-const route = useRoute()
-console.log(route)
-
 const randName = () => {
   const date = new Date()
   const year = date.getFullYear() % 100
@@ -85,61 +76,64 @@ const handleDefine = () => {
     router.go(-1)
   })
 }
-console.log(props.id == 0)
+
 const handFix = () => {
   console.log('test111')
   //router.go(-1)
 }
 
-FixBrowserApi
-
-let temp = reactive(props.modelValue)
-if (props.id == 0) {
-  temp = reactive({
-    environment: {
-      name: '',
-      remark: '',
-      cookie: []
-    },
-    webProxy: {
-      type: 0,
-      showIp: '',
-      host: '',
-      port: '',
-      account: '',
-      password: '',
-      other: {}
-    },
-    fingerprint: {
-      timeZone: { type: 0, timeZone: '' },
-      webRTC: 0,
-      location: { type: 0, latitude: 0, longitude: 0, accuracy: 0 },
-      language: { type: 0, languages: [] },
-      resolution: { type: 0, windowWidth: 0, windowHeight: 0 },
-      font: { type: 0, fontList: [] },
-      canvas: 0,
-      webGL: 0,
-      gupGL: 0,
-      webGLDevice: { type: 0, vendors: '', renderer: '' },
-      audioContext: 0,
-      mediaEquipment: { type: 0, microphone: 1, speaker: 1, videoCamera: 0 },
-      clientRects: 0,
-      speechVoices: 0,
-      resourceInfo: { type: 0, cpu: 16, memory: 8 },
-      doNotTrack: 0,
-      openPort: { type: 0, list: [] }
-    }
-  })
-  temp.environment.name = randName()
-} else {
-  GetBrowserApi({ id: props.id }).then((res) => {
-    if (res.statusCode != 200) {
-      return
-    }
-    temp = res.data
-  })
+const val = reactive({
+  environment: {
+    name: '',
+    remark: '',
+    cookie: []
+  },
+  webProxy: {
+    type: 0,
+    showIp: '',
+    host: '',
+    port: '',
+    account: '',
+    password: '',
+    other: {}
+  },
+  fingerprint: {
+    timeZone: { type: 0, timeZone: '' },
+    webRTC: 0,
+    location: { type: 0, latitude: 0, longitude: 0, accuracy: 0 },
+    language: { type: 0, languages: [] },
+    resolution: { type: 0, windowWidth: 0, windowHeight: 0 },
+    font: { type: 0, fontList: [] },
+    canvas: 0,
+    webGL: 0,
+    gupGL: 0,
+    webGLDevice: { type: 0, vendors: '', renderer: '' },
+    audioContext: 0,
+    mediaEquipment: { type: 0, microphone: 1, speaker: 1, videoCamera: 0 },
+    clientRects: 0,
+    speechVoices: 0,
+    resourceInfo: { type: 0, cpu: 16, memory: 8 },
+    doNotTrack: 0,
+    openPort: { type: 0, list: [] }
+  }
+})
+console.log(id)
+console.log(id.value == null)
+console.log(id > 0)
+if (id.value == null) {
+  val.environment.name = randName()
+} else if (id.value > 0) {
+  // GetBrowserApi({ id: id.value }).then((res) => {
+  //   if (res.statusCode != 200) {
+  //     return
+  //   }
+  //   val.environment = res.data.environment
+  //   val.webProxy = res.data.webProxy
+  //   val.fingerprint = res.data.fingerprint
+  // })
+  val.environment.name = '编辑'
+  GetBrowserApi
 }
-const val = reactive(temp)
 
 defineExpose({
   val

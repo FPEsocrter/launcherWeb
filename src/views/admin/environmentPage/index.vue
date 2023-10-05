@@ -132,9 +132,7 @@ const webProxyTypeFormat = (row, clom) => {
 const hadnleModify = (id) => {
   router.push({
     path: '/browser_add',
-    query: {
-      id: id
-    }
+    query: { id: id }
   })
 }
 
