@@ -7,6 +7,7 @@
   default-first-option：按下回车，选中当前选项列表中的第一个
   disabled:是否禁用
   placeholder：占位符，默认‘请选择’
+  
   multiple：是否多选
   collapse-tags：多选状态下，是否已一段文字显示多选的tag
   clearable：是否可清空,默认可清空

@@ -8,7 +8,9 @@ export const API = {
   BROWSER_ADD_SINGLE: '/environment/get', //查询单个环境详情
   AGENT_FIX: '/environment/get', //代理
   PRINT_FIX: '/environment/get', //指纹
-  CHECK_NETWORK: '/webProxy/detection' //检查代理
+  CHECK_NETWORK: '/webProxy/detection', //检查代理
+  UA_MAJOR_VERSION: '/fingerprint/getUaMajorVersion',
+  UA_BY_VERSION: '/fingerprint/getUaByVersion'
 }
 
 /**
@@ -87,4 +89,20 @@ export const GetPrintApi = (params) => {
  */
 export const CheckNetWordkApi = (params) => {
   return zlRequest.post(API.CHECK_NETWORK, params)
+}
+
+/**
+ * 获取ua核心版本号
+ * @returns {*}
+ */
+export const UaMajorVersionApi = (params) => {
+  return zlRequest.post(API.UA_MAJOR_VERSION, params)
+}
+
+/**
+ * 获取ua核心版本号
+ * @returns {*}
+ */
+export const UaByVersionApi = (params) => {
+  return zlRequest.post(API.UA_BY_VERSION, params)
 }

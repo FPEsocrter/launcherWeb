@@ -60,8 +60,8 @@
   </div>
 </template>
 <script setup>
-import HsInput from '@/components/assembly/HsInput.vue'
-import HsSelect from '@/components/assembly/HsSelect.vue'
+import HsInput from '@/components/assembly/hs/HsInput.vue'
+import HsSelect from '@/components/assembly/hs/HsSelect.vue'
 const props = defineProps({
   showType: { type: String, default: 'add' },
   title: { type: String, default: '添加' },

@@ -20,7 +20,7 @@
       <!-- 复选 -->
       <el-table-column v-if="check" type="selection" width="50" />
       <!-- 索引 -->
-      <el-table-column v-if="number" label="序号" :width="numberWidth ? numberWidth : '60'">
+      <el-table-column v-if="number" label="序号" :width="numberWidth ? numberWidth : '65'">
         <template #default="{ $index }">{{ $index + 1 }}</template>
       </el-table-column>
       <!-- 其他列 -->

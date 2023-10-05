@@ -4,15 +4,14 @@
     <!-- 1.搜索 -->
     <div class="account-search">
       <div class="account-search-left">
-        <el-select v-model="searchForm.webProxy" clearable placeholder="代理类型" style="width: 110px">
-          <el-option v-for="item in proxyList" :key="item.key" :label="item.key" :value="item.value" />
-        </el-select>
+        <fs-select v-model="searchForm.webProxy" placeholder="代理类型" style="width: 110px" :items="webProxyType" clearable />
         <el-input :prefix-icon="Search" v-model="searchForm.name" class="input-with-select" clearable placeholder="请输入环境名称" style="width: 160px" />
         <el-input :prefix-icon="Search" v-model="searchForm.remark" class="input-with-select" clearable placeholder="请输入环境备注" style="width: 160px" />
         <el-input :prefix-icon="Search" v-model="searchForm.area" class="input-with-select" clearable placeholder="请输入环境区域" style="width: 160px" />
       </div>
       <div class="account-search-right">
-        <el-button size="default" type="primary" @click="handleSearch">查询</el-button>
+        <fs-button size="default" type="primary" @click="handleReset">重置</fs-button>
+        <fs-button size="default" type="primary" @click="handleSearch">查询</fs-button>
       </div>
     </div>
     <!-- 2.表格 -->
@@ -38,7 +37,19 @@
           </el-dropdown>
         </template>
       </table-vue>
-      <pagination-vue v-model="paginationForm.pageNo" :size="paginationForm.pageSize" :total="pageInfo.total" />
+      <div>
+        <el-pagination
+          v-model:current-page="page.pageNo"
+          v-model:page-size="page.pageSize"
+          :page-sizes="[10, 20, 30, 40, 50]"
+          :small="small"
+          :background="background"
+          layout="sizes, prev, pager, next"
+          :total="tablePage.total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
     </div>
     <fix-agent-dialog v-model="isAgent" :row="clikeRow" @update-list="getList" />
     <fix-print-dialog v-model="isPrint" :row="clikeRow" @update-list="getList" />
@@ -47,24 +58,42 @@
 <script setup>
 import { Search } from '@element-plus/icons-vue'
 import tableVue from '@/components/business/table.vue'
-import HsButton from '@/components/assembly/HsButton.vue'
-import paginationVue from '@/components/business/pagination.vue'
-import { GetAccountList, DelAccountList } from '@/service/admin/account'
+import HsButton from '@/components/assembly/hs/HsButton.vue'
+import { GetAccountList, DelAccountList } from '@/service/admin/environmentPage'
 import { onMounted } from 'vue'
 import { prePrecessDateAll, openMessageBox } from '@/utils/common'
 import { useRouter } from 'vue-router'
 import FixAgentDialog from './components/FixAgentDialog.vue'
 import FixPrintDialog from './components/FixPrintDialog.vue'
-import { proxyList } from '@/utils/format'
+import { webProxyType } from '@/domain/enum/webProxyType'
 
 const router = useRouter()
 
-const searchForm = ref({
-  remark: null,
+const searchForm = reactive({
+  webProxy: null,
   name: null,
-  area: null,
-  webProxy: null
+  remark: null,
+  area: null
 })
+
+const tablePage = reactive({
+  total: 0,
+  list: []
+  //{name:'',remark:'',lastUseIp:'',lastOpenTime:''}
+})
+
+// 分页
+const page = reactive({
+  pageNo: 1,
+  pageSize: 10
+})
+
+const handleReset = () => {
+  searchForm.webProxy = null
+  searchForm.name = null
+  searchForm.remark = null
+  searchForm.area = null
+}
 
 // 是否显示 修改代理 弹窗
 const isAgent = ref(false)
@@ -81,7 +110,6 @@ const handleSearch = () => {
 const selectList = ref([])
 
 // 用户列表
-const userList = ref([])
 
 // 表格 列
 const columns = ref([
@@ -92,12 +120,6 @@ const columns = ref([
   { prop: 'custom', label: '打开', width: '110', fixed: 'right' },
   { prop: 'option', label: '操作', width: '80', fixed: 'right' }
 ])
-
-// 分页
-const paginationForm = ref({
-  pageNo: 1,
-  pageSize: 10
-})
 
 // 接口获取的分页信息
 const pageInfo = ref({
@@ -149,8 +171,7 @@ const handleOpen = (row) => {
 // 获取列表
 const getList = () => {
   // 合并分页、搜索
-  let postForm = prePrecessDateAll(Object.assign(searchForm.value, paginationForm.value))
-  GetAccountList(postForm).then(({ data: res }) => {
+  GetAccountList(prePrecessDateAll({ ...searchForm, ...searchForm })).then(({ data: res }) => {
     pageInfo.value.total = res.total
     userList.value = res.list
   })
@@ -167,14 +188,6 @@ const handleDel = () => {
     }
   })
 }
-
-// 监听页码变化
-watch(
-  () => paginationForm.value.pageNo,
-  () => {
-    getList()
-  }
-)
 
 onMounted(() => {
   getList()

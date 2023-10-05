@@ -113,3 +113,14 @@
   content: "\e626";
 }
 
+.randIcon:before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  background:url('~@/assets/images/svg/randsvg.svg');
+  background-size:cover;
+  filter: grayscale(100%);
+}
+
+

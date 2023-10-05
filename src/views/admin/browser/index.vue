@@ -1,184 +1,150 @@
-<!-- 新建浏览器 -->
 <template>
   <div class="browser-content">
     <div class="browser-title">导入配置</div>
-    <div class="browser-config">
-      <config-form ref="formRef" :formDetail="formDetail" :isEdit="route.query.id" />
+    <div class="config-content">
+      <el-form class="form">
+        <el-collapse model-value="1">
+          <el-collapse-item title="环境信息" name="1">
+            <div class="config-form">
+              <environment v-model="val.environment" ref="refEnvironment" />
+            </div>
+          </el-collapse-item>
+          <el-collapse-item title="代理配置" name="2">
+            <div class="config-form">
+              <web-proxy v-model="val.webProxy" ref="refWebProxy" />
+            </div>
+          </el-collapse-item>
+          <el-collapse-item title="高级" name="3">
+            <div class="config-form">
+              <fingerprint v-model="val.fingerprint" ref="refFingerprint" />
+            </div>
+          </el-collapse-item>
+        </el-collapse>
+      </el-form>
     </div>
+    <div id=""></div>
     <div class="browser-bottom">
-      <hs-button :item="definitionBtn[0]" @click-btn="handleSubmit" />
-      <hs-button :item="definitionBtn[1]" @click-btn="handleCancel" />
+      <div>
+        <fs-button @click="props.id == 0 ? handleDefine() : handFix()">确定</fs-button>
+        <fs-button @click="handleCancel">取消</fs-button>
+      </div>
     </div>
     <div class="browser-right">
-      <config-preview :formDetail="formDetail" />
+      <browser-synopsis v-model="val" />
     </div>
   </div>
 </template>
 <script setup>
-import HsButton from '@/components/assembly/HsButton.vue'
-import ConfigForm from './components/ConfigForm.vue'
-import ConfigPreview from './components/ConfigPreview.vue'
+import Environment from './components/Environment.vue'
+import WebProxy from './components/WebProxy.vue'
+import Fingerprint from './components/Fingerprint.vue'
+import BrowserSynopsis from './components/BrowserSynopsis.vue'
 import { useRouter, useRoute } from 'vue-router'
 import { AddBrowserApi, GetBrowserApi, FixBrowserApi } from '@/service/admin/browser'
-import { openMessageBox } from '@/utils/common'
-
+const props = defineProps({
+  modelValue: {
+    type: Object,
+    default: () => {}
+  },
+  id: {
+    type: Number,
+    default: 0
+  }
+})
+const refEnvironment = ref('refEnvironment')
+const refWebProxy = ref('refWebProxy')
+const refFingerprint = ref('refFingerprint')
 const router = useRouter()
 const route = useRoute()
+console.log(route)
 
-const formRef = ref(null)
-
-// 按钮定义
-const definitionBtn = [{ text: '确定', type: 'primary' }, { text: '取消' }]
-
-// 提交配置表单
-const handleSubmit = () => {
-  const configForm = formRef.value.form
-  let postForm = {
-    environment: {
-      name: configForm.name,
-      remark: configForm.meno
-    },
-    webProxy: {
-      type: configForm.agentType,
-      host: configForm.host,
-      port: configForm.port,
-      account: configForm.account,
-      password: configForm.password,
-      other: {}
-    },
-    fingerprint: {
-      userAgent: configForm.userAgent,
-      timeZone: {
-        type: configForm.time,
-        timeZone: ''
-      },
-      webRTC: configForm.webRTC,
-      location: {
-        type: configForm.location,
-        latitude: 0,
-        longitude: 0,
-        accuracy: 0
-      },
-      language: {
-        type: configForm.language
-        // languages: []
-      },
-      resolution: {
-        type: configForm.resolution
-        // windowWidth: 0,
-        // windowHeight: 0
-      },
-      font: {
-        type: configForm.font
-        // fontList: []
-      },
-      canvas: configForm.canvas,
-      webGL: configForm.webGL,
-      gupGL: configForm.gupGL,
-      webGLDevice: {
-        type: configForm.webGL
-        // vendors: '',
-        // renderer: ''
-      },
-      audioContext: configForm.audioContext,
-      mediaEquipment: {
-        type: configForm.media
-        // microphone: 0,
-        // speaker: 0,
-        // videoCamera: 0
-      },
-      clientRects: configForm.clientRects,
-      speechVoices: configForm.speechVoices,
-      resourceInfo: {
-        type: configForm.resourceInfo
-        // cpu: 0,
-        // memory: 0
-      },
-      doNotTrack: configForm.track,
-      openPort: {
-        type: configForm.protect
-        // list: []
-      }
-    },
-    chromiumData: {
-      // cookie: configForm.cookie
-      cookie: {}
-    }
-  }
-
-  // 是否为 编辑
-  if (route.query.id) {
-    console.log(postForm, configForm)
-    // 编辑
-    postForm['id'] = Number(route.query.id)
-    FixBrowserApi(postForm).then((res) => {
-      if (res.statusCode == 200) {
-        // 编辑不清空
-        // clearForm()
-        openMessageBox('修改成功', 'success')
-      } else {
-        openMessageBox(res.message, 'error')
-      }
-    })
-  } else {
-    // 新增
-    AddBrowserApi(postForm).then((res) => {
-      if (res.statusCode == 200) {
-        clearForm()
-        // 不显示ip信息
-        formRef.value.isShowIp = false
-        openMessageBox('添加成功', 'success')
-      } else {
-        openMessageBox(res.message, 'error')
-      }
-    })
-  }
+const randName = () => {
+  const date = new Date()
+  const year = date.getFullYear() % 100
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  let random = Math.floor(Math.random() * 100)
+  random = (random < 10 ? '0' : '') + random
+  return `env${year}${month}${day}${hours}${minutes}${seconds}${random}`
 }
 
-// 清空表单
-const clearForm = () => {
-  formRef.value.formRefs.resetFields()
-  formRef.value.form.time = 0
-  formRef.value.form.webRTC = 0
-  formRef.value.form.location = 0
-  formRef.value.form.language = 0
-  formRef.value.form.resolution = 0
-  formRef.value.form.font = 0
-  formRef.value.form.canvas = 0
-  formRef.value.form.webGL = 0
-  formRef.value.form.metadata = 0
-  formRef.value.form.audioContext = 0
-  formRef.value.form.media = 0
-  formRef.value.form.clientRects = 0
-  formRef.value.form.speechVoices = 0
-  formRef.value.form.resourceInfo = 0
-  formRef.value.form.track = 0
-  formRef.value.form.protect = 0
-}
-
-// 返回上一级
 const handleCancel = () => {
   router.go(-1)
 }
 
-// 表单详情
-const formDetail = ref({})
-
-// 获取详情->回填表单以及概要
-const getDetail = (id) => {
-  GetBrowserApi({ id: id }).then(({ data: res }) => {
-    formDetail.value = res
+const handleDefine = () => {
+  const verifMsg = [...refEnvironment.value.verifMsg, ...refWebProxy.value.verifMsg, ...refFingerprint.value.verifMsg]
+  console.log(verifMsg)
+  AddBrowserApi(val).then((res) => {
+    if (res.statusCode != 200) {
+      return
+    }
+    router.go(-1)
   })
 }
+console.log(props.id == 0)
+const handFix = () => {
+  console.log('test111')
+  //router.go(-1)
+}
 
-onMounted(() => {
-  // 是否为 编辑
-  if (route.query.id) {
-    getDetail(route.query.id)
-  }
+FixBrowserApi
+
+let temp = reactive(props.modelValue)
+if (props.id == 0) {
+  temp = reactive({
+    environment: {
+      name: '',
+      remark: '',
+      cookie: []
+    },
+    webProxy: {
+      type: 0,
+      showIp: '',
+      host: '',
+      port: '',
+      account: '',
+      password: '',
+      other: {}
+    },
+    fingerprint: {
+      timeZone: { type: 0, timeZone: '' },
+      webRTC: 0,
+      location: { type: 0, latitude: 0, longitude: 0, accuracy: 0 },
+      language: { type: 0, languages: [] },
+      resolution: { type: 0, windowWidth: 0, windowHeight: 0 },
+      font: { type: 0, fontList: [] },
+      canvas: 0,
+      webGL: 0,
+      gupGL: 0,
+      webGLDevice: { type: 0, vendors: '', renderer: '' },
+      audioContext: 0,
+      mediaEquipment: { type: 0, microphone: 1, speaker: 1, videoCamera: 0 },
+      clientRects: 0,
+      speechVoices: 0,
+      resourceInfo: { type: 0, cpu: 16, memory: 8 },
+      doNotTrack: 0,
+      openPort: { type: 0, list: [] }
+    }
+  })
+  temp.environment.name = randName()
+} else {
+  GetBrowserApi({ id: props.id }).then((res) => {
+    if (res.statusCode != 200) {
+      return
+    }
+    temp = res.data
+  })
+}
+const val = reactive(temp)
+
+defineExpose({
+  val
 })
 </script>
-
 <style lang="scss" scoped>
 .browser-content {
   position: relative;

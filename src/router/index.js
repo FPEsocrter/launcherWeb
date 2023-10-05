@@ -28,7 +28,7 @@ const routes = [
         meta: {
           title: '账号管理'
         },
-        component: () => import('@/views/admin/accountManage/index.vue')
+        component: () => import('@/views/admin/environmentPage/index.vue')
       },
       {
         path: '/browser_add',
