@@ -25,8 +25,8 @@
     <div id=""></div>
     <div class="browser-bottom">
       <div>
-        <fs-button @click="props.id == 0 ? handleDefine() : handFix()">确定</fs-button>
-        <fs-button @click="handleCancel">取消</fs-button>
+        <el-button-f @click="id == null ? handleDefine() : handFix()">确定</el-button-f>
+        <el-button-f @click="handleCancel">取消</el-button-f>
       </div>
     </div>
     <div class="browser-right">
@@ -41,10 +41,8 @@ import Fingerprint from './components/Fingerprint.vue'
 import BrowserSynopsis from './components/BrowserSynopsis.vue'
 import { useRouter, useRoute } from 'vue-router'
 import { AddBrowserApi, GetBrowserApi, FixBrowserApi } from '@/service/admin/browser'
-FixBrowserApi
 const route = useRoute()
 const id = ref(route.query.id)
-
 const refEnvironment = ref('refEnvironment')
 const refWebProxy = ref('refWebProxy')
 const refFingerprint = ref('refFingerprint')
@@ -65,10 +63,14 @@ const randName = () => {
 const handleCancel = () => {
   router.go(-1)
 }
+const verifMsg = () => {
+  const verifMsg = [...refEnvironment.value.verifMsg, ...refWebProxy.value.verifMsg, ...refFingerprint.value.verifMsg]
+  //todo 验证
+  verifMsg
+}
 
 const handleDefine = () => {
-  const verifMsg = [...refEnvironment.value.verifMsg, ...refWebProxy.value.verifMsg, ...refFingerprint.value.verifMsg]
-  console.log(verifMsg)
+  verifMsg()
   AddBrowserApi(val).then((res) => {
     if (res.statusCode != 200) {
       return
@@ -78,14 +80,20 @@ const handleDefine = () => {
 }
 
 const handFix = () => {
-  console.log('test111')
-  //router.go(-1)
+  verifMsg()
+  FixBrowserApi({ id: id.value, ...val }).then((res) => {
+    if (res.statusCode != 200) {
+      return
+    }
+    router.go(-1)
+  })
 }
 
 const val = reactive({
   environment: {
     name: '',
     remark: '',
+    userAgent: '',
     cookie: []
   },
   webProxy: {
@@ -117,22 +125,26 @@ const val = reactive({
     openPort: { type: 0, list: [] }
   }
 })
-console.log(id)
-console.log(id.value == null)
-console.log(id > 0)
+
 if (id.value == null) {
   val.environment.name = randName()
 } else if (id.value > 0) {
-  // GetBrowserApi({ id: id.value }).then((res) => {
-  //   if (res.statusCode != 200) {
-  //     return
-  //   }
-  //   val.environment = res.data.environment
-  //   val.webProxy = res.data.webProxy
-  //   val.fingerprint = res.data.fingerprint
-  // })
-  val.environment.name = '编辑'
-  GetBrowserApi
+  GetBrowserApi({ id: id.value }).then((res) => {
+    if (res.statusCode != 200) {
+      return
+    }
+    Object.keys(val.environment).forEach((key) => {
+      val.environment[key] = res.data.environment[key]
+    })
+
+    Object.keys(val.webProxy).forEach((key) => {
+      val.webProxy[key] = res.data.webProxy[key]
+    })
+
+    Object.keys(val.fingerprint).forEach((key) => {
+      val.fingerprint[key] = res.data.fingerprint[key]
+    })
+  })
 }
 
 defineExpose({

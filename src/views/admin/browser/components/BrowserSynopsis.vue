@@ -4,10 +4,10 @@
     <div class="config-preview-title">
       <span>概要</span>
       <div class="config-preview-btn">
-        <fs-button :disabled="true">
+        <el-button-f :disabled="true">
           <icon-font icon="randIcon" />
           <span @click="handleClick">生成新指纹</span>
-        </fs-button>
+        </el-button-f>
       </div>
     </div>
     <el-scrollbar>

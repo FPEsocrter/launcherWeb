@@ -35,16 +35,13 @@ export const FixBrowserApi = (params) => {
  * 查询详情
  * @param {Object} params
  * @param {Object} params.id
+ * @param {Boolean} params.webProxy
+ * @param {Boolean} params.fingerprint
+ * @param {Boolean} params.chromiumData
  * @return {*}
  */
 export const GetBrowserApi = (params) => {
-  return zlRequest.post(API.BROWSER_ADD_SINGLE, {
-    id: params.id,
-    environment: true,
-    webProxy: true,
-    fingerprint: true,
-    chromiumData: true
-  })
+  return zlRequest.post(API.BROWSER_ADD_SINGLE, params)
 }
 
 /**

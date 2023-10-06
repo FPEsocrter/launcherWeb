@@ -2,10 +2,10 @@
   <div>
     <div class="proxy-type">
       <el-form-item :label="'代理类型'">
-        <fs-select v-model="webProxy.type" :items="webProxyType" :placeholder="'请选择'" />
+        <el-select-f v-model="webProxy.type" :items="webProxyType" :placeholder="'请选择'" />
       </el-form-item>
       <div class="config-check-btn">
-        <fs-button @click="handleCheck"> 检查网络 </fs-button>
+        <el-button-f @click="handleCheck"> 检查网络 </el-button-f>
       </div>
     </div>
 
@@ -43,6 +43,7 @@
 <script setup>
 import { webProxyType } from '@/domain/enum/webProxyType'
 import { CheckNetWordkApi } from '@/service/admin/browser'
+import { openMessageBox } from '@/utils/common'
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -67,6 +68,19 @@ const verif = reactive({ host: false, port: false })
 const ipInfo = reactive({ showIp: false, ips: [], countryCode: '', region: null, city: '' })
 
 const handleCheck = () => {
+  if (verifMsg.value.length > 0) {
+    switch (webProxy.type) {
+      case 1:
+      case 2:
+      case 3:
+      case 4:
+        {
+          openMessageBox(verifMsg.value.join(','), 'error')
+        }
+        return
+    }
+  }
+
   CheckNetWordkApi(webProxy).then((res) => {
     if (res.statusCode != 200) {
       return
@@ -79,6 +93,7 @@ const handleCheck = () => {
   })
 }
 let verifMsg = ref([])
+
 watch(
   () => webProxy,
   (newValue) => {
@@ -112,7 +127,7 @@ const convertToEmptyString = (value) => {
     return ''
   }
   value = Number(value)
-  if (!isNaN(value) && typeof value == 'number') {
+  if (!isNaN(value) && typeof value == 'number' && value > 0) {
     return Number(value)
   }
   return ''

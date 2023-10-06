@@ -7,11 +7,11 @@
     </div>
     <div class="environment-userAgent">
       <el-form-item :label="'UserAgent'" :required="verif.userAgent">
-        <fs-select v-model="checkItems" :multiple="true" :items="items" />
+        <el-select-f v-model="checkItems" :multiple="true" :items="items" />
         <el-input v-model.trim="environment.userAgent">
           <template #append>
             :
-            <el-button @click="handleClick" />
+            <el-button-f @click="handleClick" />
           </template>
         </el-input>
       </el-form-item>
@@ -43,6 +43,7 @@ const props = defineProps({
 const checkItems = ref([])
 const items = ref([])
 const environment = reactive(props.modelValue) //reactive
+
 UaMajorVersionApi().then((res) => {
   if (res.statusCode != 200) {
     return

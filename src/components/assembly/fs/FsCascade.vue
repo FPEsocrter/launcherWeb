@@ -14,7 +14,7 @@
         v-for="(op, index) in items"
         :key="index"
         :class="{
-          'active-btn': reIndexFlag && props.reIndex ? val == index : val == op.key
+          'active-btn': reIndexFlag ? val == index : val == op.key
         }"
         @click="handleChange(index, op.key)"
         >{{ op.value }}</span
@@ -27,7 +27,7 @@
 </template>
 <script setup>
 const props = defineProps({
-  modelValue: { type: Number, default: 0 },
+  modelValue: { type: [Number, String], default: 0 },
   items: {
     type: [Array, Object],
     default: () => {
@@ -45,8 +45,14 @@ const props = defineProps({
     default: true
   }
 })
-const emit = defineEmits(['onChange', 'update:modelValue'])
+const emit = defineEmits(['change', 'update:modelValue'])
 const val = ref(props.modelValue)
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    val.value = newValue
+  }
+)
 let reIndexFlag = false
 const items = computed(() => {
   let itemList = []
@@ -70,9 +76,10 @@ const items = computed(() => {
   return itemList
 })
 
+reIndexFlag = reIndexFlag && props.reIndex
 // 监听控件输入事件 并更新绑定值
 const handleChange = (index, key) => {
-  if (reIndexFlag && props.reIndex) {
+  if (reIndexFlag) {
     val.value = index
   } else {
     val.value = key

@@ -3,7 +3,8 @@ import zlRequest from '@/utils/http/index'
 
 export const API = {
   ENVIRONMENT_PAGE: '/environment/page', //列表
-  ACCOUNT_DEL: '/environment/delete' //删除
+  ENVIRONMENT_DEL: '/environment/delete', //删除
+  ENVIRONMENT_OPEN: '/launcher/open' //打开环境
 }
 
 /**
@@ -15,7 +16,7 @@ export const API = {
  * @param {String} params.area - 环境区域
  * @param {integer} params.currentPage - 页码
  * @param {integer} params.pageSize - 分页的大小
- * @return {total:0,list:{rowNumber:0,SerialNumber:id,name,remark,lastUseIp,area,lastOpenTime,webProxyType}}
+ * @return {total:0,list:{rowNumber:0,SerialNumber:id,name,remark,lastUseIp,area,lastOpenTime,webProxyType,open}}
  */
 export const GetEnvironmentPage = (params) => {
   return zlRequest.post(API.ENVIRONMENT_PAGE, params)
@@ -27,5 +28,14 @@ export const GetEnvironmentPage = (params) => {
  * @return {*}
  */
 export const DelEnvironment = (params) => {
-  return zlRequest.post(API.ACCOUNT_DEL, { ids: params })
+  return zlRequest.post(API.ENVIRONMENT_DEL, { ids: params })
+}
+
+/**
+ * 账号管理 删除
+ * @param {Array} params [id,id]
+ * @return {*}
+ */
+export const OpenEnvironment = (params) => {
+  return zlRequest.post(API.ENVIRONMENT_OPEN, { ids: params })
 }

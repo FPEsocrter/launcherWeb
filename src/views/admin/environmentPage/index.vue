@@ -4,14 +4,14 @@
     <!-- 1.搜索 -->
     <div class="account-search">
       <div class="account-search-left">
-        <fs-select v-model="searchForm.webProxy" placeholder="代理类型" style="width: 160px" :items="webProxyType" clearable />
+        <el-select-f v-model="searchForm.webProxy" placeholder="代理类型" :items="webProxyType" style="width: 160px" clearable />
         <el-input :prefix-icon="Search" v-model="searchForm.name" class="input-with-select" clearable placeholder="请输入环境名称" style="width: 160px" />
         <el-input :prefix-icon="Search" v-model="searchForm.remark" class="input-with-select" clearable placeholder="请输入环境备注" style="width: 160px" />
         <el-input :prefix-icon="Search" v-model="searchForm.area" class="input-with-select" clearable placeholder="请输入环境区域" style="width: 160px" />
       </div>
       <div class="account-search-right">
-        <fs-button size="default" type="primary" @click="handleReset">重置</fs-button>
-        <fs-button size="default" type="primary" @click="handleSearch">查询</fs-button>
+        <el-button-f size="default" type="primary" @click="handleReset">重置</el-button-f>
+        <el-button-f size="default" type="primary" @click="handleSearch">查询</el-button-f>
       </div>
     </div>
     <!-- 2.表格 -->
@@ -29,14 +29,12 @@
           <el-table-column prop="lastOpenTime" label="最近一次打开的时间" width="200" :formatter="driverNameFormat" />
           <el-table-column label="操作" width="300">
             <template #default="scope">
-              <fs-button @click="hadnleModify(scope.row.id)">编辑</fs-button>
-              <fs-button @click=";(deleteInfo.dialog = true), (deleteInfo.ids = [scope.row.id])">删除</fs-button>
-              <fs-button>修改代理</fs-button>
-              <fs-button>修改指纹</fs-button>
+              <el-button-f @click="hadnleModify(scope.row.id)">编辑</el-button-f>
+              <el-button-f @click=";(deleteInfo.dialog = true), (deleteInfo.ids = [scope.row.id])">删除</el-button-f>
+              <el-button-f @click=";(webProxyDia.dialog = true), (webProxyDia.id = scope.row.id)">修改代理</el-button-f>
+              <el-button-f @click=";(fingerprintDia.dialog = true), (fingerprintDia.id = scope.row.id)">修改指纹</el-button-f>
+              <el-button-f v-if="scope.row.open" @click="handleOpenBrowser(scope.row.id)">打开环境</el-button-f>
             </template>
-            <!--
-               <el-button size="small" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
-            </template> -->
           </el-table-column>
         </el-table>
       </div>
@@ -65,13 +63,17 @@
       </template>
     </el-dialog>
   </div>
+  <modify-web-proxy v-model="webProxyDia" @submit="getList(), (webProxyDia.dialog = false)" />
+  <modify-fingerprint v-model="fingerprintDia" @submit="getList(), (fingerprintDia.dialog = false)" />
 </template>
 <script setup>
 import { Search } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import { webProxyType } from '@/domain/enum/webProxyType'
+import modifyWebProxy from './components/modifyWebProxy.vue'
+import modifyFingerprint from './components/modifyFingerprint.vue'
 import { prePrecessDateAll, openMessageBox } from '@/utils/common'
-import { GetEnvironmentPage, DelEnvironment } from '@/service/admin/environmentPage'
+import { GetEnvironmentPage, DelEnvironment, OpenEnvironment } from '@/service/admin/environmentPage'
 import { onMounted } from 'vue'
 
 const router = useRouter()
@@ -86,6 +88,22 @@ const deleteInfo = reactive({
   dialog: false,
   ids: []
 })
+
+const webProxyDia = reactive({
+  dialog: false,
+  id: 0
+})
+
+const fingerprintDia = reactive({
+  dialog: false,
+  id: 0
+})
+
+const handleOpenBrowser = (id) => {
+  OpenEnvironment([id]).then((res) => {
+    console.log(res)
+  })
+}
 
 const tablePage = reactive({
   total: 0,
@@ -104,7 +122,6 @@ const getList = () => {
     if (res.statusCode != 200) {
       return
     }
-    console.log(res)
     tablePage.total = res.data.total
     tablePage.list = res.data.list
   })
@@ -122,6 +139,7 @@ const handleSearch = getList
 const handlePageChange = getList
 
 const driverNameFormat = (row, clom) => {
+  console.log(row)
   return row[clom.property] == null || row[clom.property] == 'null' ? '' : row[clom.property]
 }
 const typeKeys = Object.keys(webProxyType)
