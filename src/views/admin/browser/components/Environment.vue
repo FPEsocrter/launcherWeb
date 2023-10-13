@@ -7,13 +7,16 @@
     </div>
     <div class="environment-userAgent">
       <el-form-item :label="'UserAgent'" :required="verif.userAgent">
-        <el-select-f v-model="checkItems" :multiple="true" :items="items" />
-        <el-input v-model.trim="environment.userAgent">
-          <template #append>
-            :
-            <el-button-f @click="handleClick" />
-          </template>
-        </el-input>
+        <div class="user-agrent-css">
+          <el-select-f v-model="checkItems" multiple collapse-tags collapse-tags-tooltip max-collapse-tags="2" :items="items" />
+          <el-input v-model.trim="environment.userAgent">
+            <template #append>
+              <el-button-f @click="handleClick">
+                <icon-font icon="icon-tihuancon" />
+              </el-button-f>
+            </template>
+          </el-input>
+        </div>
       </el-form-item>
     </div>
     <div class="environment-remark">
@@ -31,7 +34,9 @@
 </template>
 <script setup>
 import { UaMajorVersionApi, UaByVersionApi } from '@/service/admin/browser'
-import { Integer } from '@/domain/constant/baseType,js'
+import { Integer } from '@/domain/constant/baseType'
+import { openMessageBox } from '@/utils/common'
+
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -44,32 +49,44 @@ const checkItems = ref([])
 const items = ref([])
 const environment = reactive(props.modelValue) //reactive
 
-UaMajorVersionApi().then((res) => {
-  if (res.statusCode != 200) {
-    return
-  }
-  res.data.forEach((elt) => {
-    items.value.push(elt)
+UaMajorVersionApi()
+  .then((res) => {
+    if (res.statusCode != 200) {
+      return
+    }
+    res.data.forEach((elt) => {
+      items.value.push(elt)
+    })
+    for (let i = 0; i < 3; i++) {
+      checkItems.value.push(res.data[i])
+    }
   })
-  for (let i = 0; i < 3; i++) {
-    checkItems.value.push(res.data[i])
-  }
-})
+  .catch((error) => {
+    openMessageBox(error, 'error')
+  })
 
-UaByVersionApi({ uaVersion: [Integer.MAX_VALUE] }).then((res) => {
-  if (res.statusCode != 200) {
-    return
-  }
-  environment.userAgent = res.data
-})
-
-const handleClick = () => {
-  UaByVersionApi({ uaVersion: checkItems.value }).then((res) => {
+UaByVersionApi({ uaVersion: [Integer.MAX_VALUE] })
+  .then((res) => {
     if (res.statusCode != 200) {
       return
     }
     environment.userAgent = res.data
   })
+  .catch((error) => {
+    openMessageBox(error, 'error')
+  })
+
+const handleClick = () => {
+  UaByVersionApi({ uaVersion: checkItems.value })
+    .then((res) => {
+      if (res.statusCode != 200) {
+        return
+      }
+      environment.userAgent = res.data
+    })
+    .catch((error) => {
+      openMessageBox(error, 'error')
+    })
 }
 
 const verif = reactive({ name: false, userAgent: false })
@@ -103,5 +120,16 @@ defineExpose({
 }
 .aligned-input {
   width: 100%; /* 设置输入框宽度为100%以充满el-form-item */
+}
+
+.user-agrent-css {
+  display: flex;
+  width: 100%;
+  .el-select {
+    margin-right: 10px;
+  }
+}
+:deep(.el-form-item__label) {
+  width: 120px !important;
 }
 </style>

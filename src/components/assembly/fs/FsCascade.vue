@@ -105,9 +105,10 @@ defineExpose({
     border: 1px solid #e5e8ef;
     height: 32px;
     line-height: 32px;
+    border-right: none;
   }
   span:nth-child(odd) {
-    border-right: none;
+    // border-right: none;
   }
   span:first-child {
     border-top-left-radius: 6px;
@@ -116,7 +117,7 @@ defineExpose({
   span:last-child {
     border-top-right-radius: 6px;
     border-bottom-right-radius: 6px;
-    border-left: none;
+    // border-left: none;
     border-right: 1px solid #e5e8ef;
   }
 }

@@ -1,12 +1,12 @@
 import axios from 'axios'
 // import { useStore } from '@/store'
-import { BASE_URL } from '@/environment'
+import { BASE_URL, TIME_OUT } from '@/environment'
 import { openMessageBox } from '@/utils/common'
 import { RESPONSE_CODE } from '@/constants/response-code'
 import { httpConfig } from './setting-config'
 // import storageLocal from '@/utils/storage'
 // import { login } from '@/config/constants/hint'
-import router from '@/router'
+// import router from '@/router'
 
 // const auth = computed(() => {
 //   return useStore('auth')
@@ -16,6 +16,7 @@ import router from '@/router'
 //   _target: null,
 //   _count: 0
 // }
+console.log(BASE_URL)
 export class Http {
   constructor(baseURL = BASE_URL, customOptions) {
     this.custom_options = Object.assign(
@@ -38,7 +39,7 @@ export class Http {
         'Content-Type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest'
       },
-      timeout: 10000
+      timeout: TIME_OUT
     })
     this.interceptors()
   }
@@ -88,10 +89,10 @@ export class Http {
       },
       (error) => {
         // this.custom_options.loading && closeLoading(this.custom_options)
-        window.sessionStorage.clear()
-        router.push('/account_manage')
-        errTip(error)
-        Promise.reject(error)
+        // window.sessionStorage.clear()
+        // router.push('/account_manage')
+        // errTip(error)
+        return Promise.reject(error.message)
       }
     )
   }
@@ -131,22 +132,22 @@ export class Http {
 //   }
 // }
 
-function errTip(error, msg = '未知错误') {
-  const tip = {
-    400: '请求错误',
-    401: '未授权，请登录',
-    403: '拒绝访问',
-    404: `请求地址出错${error?.response?.config?.url}`,
-    405: `请求方式不允许`,
-    408: '请求超时',
-    500: '服务器内部错误',
-    501: '服务未实现',
-    502: '网关错误',
-    503: '服务不可用',
-    504: '网关超时',
-    505: 'HTTP版本不受支持'
-  }
-  openMessageBox(tip[error?.response?.status] || msg, 'error')
-}
+// function errTip(error, msg = '未知错误') {
+//   const tip = {
+//     400: '请求错误',
+//     401: '未授权，请登录',
+//     403: '拒绝访问',
+//     404: `请求地址出错${error?.response?.config?.url}`,
+//     405: `请求方式不允许`,
+//     408: '请求超时',
+//     500: '服务器内部错误',
+//     501: '服务未实现',
+//     502: '网关错误',
+//     503: '服务不可用',
+//     504: '网关超时',
+//     505: 'HTTP版本不受支持'
+//   }
+//   openMessageBox(tip[error?.response?.status] || msg, 'error')
+// }
 
 export default new Http()

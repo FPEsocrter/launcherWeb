@@ -37,7 +37,6 @@ const handleInput = (value) => {
   emit('update:modelValue', value)
   emit('changeInput', it.value.prop)
 }
-
 // 监听value值
 watch(
   () => [props.modelValue, props.item],

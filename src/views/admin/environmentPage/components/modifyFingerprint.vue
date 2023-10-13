@@ -2,7 +2,9 @@
 <template>
   <el-dialog v-model="fingerprintDig.dialog" :close-on-click-modal="true" :title="'修改指纹'" :width="'600px'" @close="fingerprintDig.dialog = false">
     <div class="config-form">
-      <fingerprint v-model="fingerprintInfo" ref="reffingerprint" />
+      <el-scrollbar>
+        <fingerprint v-model="fingerprintInfo" ref="reffingerprint" />
+      </el-scrollbar>
     </div>
     <template #footer>
       <span class="dialog-footer">
@@ -15,6 +17,8 @@
 <script setup>
 import Fingerprint from '@/views/admin/browser/components/Fingerprint.vue'
 import { GetBrowserApi, FixBrowserApi } from '@/service/admin/browser'
+import { openMessageBox } from '@/utils/common'
+
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -47,24 +51,33 @@ const fingerprintInfo = reactive({
   openPort: { type: 0, list: [] }
 })
 const getBrowserInfo = () => {
-  GetBrowserApi({ id: fingerprintDig.id, fingerprint: true }).then((res) => {
-    Object.keys(fingerprintInfo).forEach((key) => {
-      fingerprintInfo[key] = res.data.fingerprint[key]
+  GetBrowserApi({ id: fingerprintDig.id, fingerprint: true })
+    .then((res) => {
+      Object.keys(fingerprintInfo).forEach((key) => {
+        fingerprintInfo[key] = res.data.fingerprint[key]
+      })
     })
-  })
+    .catch((error) => {
+      openMessageBox(error, 'error')
+    })
 }
 watch(() => fingerprintDig.dialog, getBrowserInfo)
 
 const hadnleFix = () => {
   console.log(...reffingerprint.value.verifMsg)
-  FixBrowserApi({ id: fingerprintDig.id, fingerprint: fingerprintInfo }).then(() => {
-    emit('submit')
-  })
+  FixBrowserApi({ id: fingerprintDig.id, fingerprint: fingerprintInfo })
+    .then(() => {
+      emit('submit')
+    })
+    .catch((error) => {
+      openMessageBox(error, 'error')
+    })
 }
 </script>
 <style lang="scss" scoped>
 .config-form {
   width: 85%;
   margin: 0 auto;
+  height: 360px;
 }
 </style>

@@ -19,27 +19,53 @@
       <div class="table-content">
         <!-- {rowNumber:0,SerialNumber:id,name,remark,lastUseIp,area,lastOpenTime,webProxyType} -->
         <el-table :data="tablePage.list" style="width: 100%">
-          <el-table-column fixed prop="rowNumber" label="行号" width="80" />
-          <el-table-column prop="serialNumber" label="序号" width="140" />
-          <el-table-column prop="name" label="环境名称" width="230" />
-          <el-table-column prop="webProxy" label="代理类型" width="120" :formatter="webProxyTypeFormat" />
-          <el-table-column prop="remark" label="备注" width="200" :formatter="driverNameFormat" />
-          <el-table-column prop="lastUseIp" label="最后一次使用的ip" width="200" :formatter="driverNameFormat" />
-          <el-table-column prop="area" label="ip所在地区" width="200" :formatter="driverNameFormat" />
-          <el-table-column prop="lastOpenTime" label="最近一次打开的时间" width="200" :formatter="driverNameFormat" />
-          <el-table-column label="操作" width="300">
+          <el-table-column prop="rowNumber" label="行号" width="60" fixed="left" />
+          <el-table-column prop="serialNumber" label="序号" width="100" :show-overflow-tooltip="true" fixed="left" />
+          <el-table-column prop="name" label="环境名称" width="180" :show-overflow-tooltip="true" fixed="left" />
+          <el-table-column prop="webProxy" label="代理类型" width="100" :formatter="webProxyTypeFormat" />
+          <el-table-column prop="remark" label="备注" width="120" :formatter="driverNameFormat" />
+          <el-table-column prop="lastUseIp" label="最后一次使用的ip" width="150" :formatter="driverNameFormat" />
+          <el-table-column prop="area" label="ip所在地区" width="150" :formatter="driverNameFormat" />
+          <el-table-column prop="lastOpenTime" label="最近一次打开的时间" width="150" :formatter="driverNameFormat" />
+          <el-table-column label="打开" width="100" fixed="right">
             <template #default="scope">
-              <el-button-f @click="hadnleModify(scope.row.id)">编辑</el-button-f>
-              <el-button-f @click=";(deleteInfo.dialog = true), (deleteInfo.ids = [scope.row.id])">删除</el-button-f>
+              <el-button-f size="small" v-if="scope.row.open" @click="handleOpenBrowser(scope.row.id)">打开环境</el-button-f>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="60" fixed="right">
+            <template #default="scope">
+              <el-dropdown size="small" trigger="click">
+                <span class="account-dropdown">
+                  <icon-font icon="icon-xitongpeizhi" />
+                </span>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item command="edit">
+                      <el-button-f size="small" @click="hadnleModify(scope.row.id)">编辑</el-button-f>
+                    </el-dropdown-item>
+                    <el-dropdown-item command="delete">
+                      <el-button-f size="small" @click=";(webProxyDia.dialog = true), (webProxyDia.id = scope.row.id)">修改代理</el-button-f>
+                    </el-dropdown-item>
+                    <el-dropdown-item command="fixAgent">
+                      <el-button-f size="small" @click=";(webProxyDia.dialog = true), (webProxyDia.id = scope.row.id)">修改代理</el-button-f>
+                    </el-dropdown-item>
+                    <el-dropdown-item command="fixPrint">
+                      <el-button-f size="small" @click=";(fingerprintDia.dialog = true), (fingerprintDia.id = scope.row.id)">修改指纹</el-button-f>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+              <!-- <el-button-f @click=";(deleteInfo.dialog = true), (deleteInfo.ids = [scope.row.id])">删除</el-button-f>
               <el-button-f @click=";(webProxyDia.dialog = true), (webProxyDia.id = scope.row.id)">修改代理</el-button-f>
               <el-button-f @click=";(fingerprintDia.dialog = true), (fingerprintDia.id = scope.row.id)">修改指纹</el-button-f>
-              <el-button-f v-if="scope.row.open" @click="handleOpenBrowser(scope.row.id)">打开环境</el-button-f>
+              <el-button-f v-if="scope.row.open" @click="handleOpenBrowser(scope.row.id)">打开环境</el-button-f> -->
             </template>
           </el-table-column>
         </el-table>
       </div>
-      <div style="margin-top: 2%">
+      <div class="pagination-content">
         <el-pagination
+          small
           v-model:current-page="page.currentPage"
           v-model:page-size="page.pageSize"
           :page-sizes="[10, 20, 30, 40, 50]"
@@ -53,7 +79,7 @@
     </div>
   </div>
   <div>
-    <el-dialog v-model="deleteInfo.dialog" title="Tips" width="30%" draggable>
+    <el-dialog v-model="deleteInfo.dialog" title="提示" width="30%" draggable>
       <span>确定要删除环境吗</span>
       <template #footer>
         <span class="dialog-footer">
@@ -100,9 +126,13 @@ const fingerprintDia = reactive({
 })
 
 const handleOpenBrowser = (id) => {
-  OpenEnvironment([id]).then((res) => {
-    console.log(res)
-  })
+  OpenEnvironment([id])
+    .then((res) => {
+      console.log(res)
+    })
+    .catch((error) => {
+      openMessageBox(error, 'error')
+    })
 }
 
 const tablePage = reactive({
@@ -118,13 +148,17 @@ const page = reactive({
 })
 
 const getList = () => {
-  GetEnvironmentPage(prePrecessDateAll({ ...searchForm, ...page })).then((res) => {
-    if (res.statusCode != 200) {
-      return
-    }
-    tablePage.total = res.data.total
-    tablePage.list = res.data.list
-  })
+  GetEnvironmentPage(prePrecessDateAll({ ...searchForm, ...page }))
+    .then((res) => {
+      if (res.statusCode != 200) {
+        return
+      }
+      tablePage.total = res.data.total
+      tablePage.list = res.data.list
+    })
+    .catch((error) => {
+      openMessageBox(error, 'error')
+    })
 }
 
 const handleReset = () => {
@@ -139,7 +173,7 @@ const handleSearch = getList
 const handlePageChange = getList
 
 const driverNameFormat = (row, clom) => {
-  console.log(row)
+  // console.log(row)
   return row[clom.property] == null || row[clom.property] == 'null' ? '' : row[clom.property]
 }
 const typeKeys = Object.keys(webProxyType)
@@ -155,16 +189,20 @@ const hadnleModify = (id) => {
 }
 
 const handleDelete = () => {
-  DelEnvironment(deleteInfo.ids).then(({ data: res }) => {
-    deleteInfo.dialog = false
-    deleteInfo.ids = []
-    if (res) {
-      openMessageBox('删除成功', 'success')
-    } else {
-      openMessageBox('删除失败', 'error')
-    }
-    getList()
-  })
+  DelEnvironment(deleteInfo.ids)
+    .then(({ data: res }) => {
+      deleteInfo.dialog = false
+      deleteInfo.ids = []
+      if (res) {
+        openMessageBox('删除成功', 'success')
+      } else {
+        openMessageBox('删除失败', 'error')
+      }
+      getList()
+    })
+    .catch((error) => {
+      openMessageBox(error, 'error')
+    })
 }
 
 onMounted(() => {
@@ -201,5 +239,13 @@ onMounted(() => {
 .el-dropdown {
   height: 23px;
   line-height: 23px;
+}
+
+:deep(.el-dropdown-menu__item) {
+  padding: 0 !important;
+  .el-button {
+    width: 100%;
+    border: none !important;
+  }
 }
 </style>

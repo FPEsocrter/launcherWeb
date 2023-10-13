@@ -1,6 +1,6 @@
 <template>
   <div class="cascade-btn">
-    <el-form-item label="时区">
+    <el-form-item label="时区1">
       <fs-cascade v-model="fingerprint.timeZone.type" :items="{ 0: '默认', 1: '本机', 3: '基于ip' }" />
     </el-form-item>
   </div>
@@ -120,3 +120,44 @@ defineExpose({
   verifMsg
 })
 </script>
+<style lang="scss" scoped>
+.config-preview {
+  height: 100%;
+}
+.config-preview-title {
+  position: relative;
+  margin-bottom: 15px;
+  height: 32px;
+  line-height: 32px;
+  .config-preview-btn {
+    top: 0;
+    right: 0;
+    // padding: 5px 8px;
+    // border: 1px solid #409eff;
+    position: absolute;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #409eff;
+    cursor: pointer;
+    span {
+      margin-left: 5px;
+    }
+  }
+}
+.config-preview-row {
+  font-size: 13px;
+  margin-bottom: 10px;
+  .config-preview-label {
+    color: #a4a5a7;
+    margin-right: 12px;
+  }
+}
+
+:deep(.el-scrollbar__wrap) {
+  height: 90% !important;
+}
+
+:deep(.el-form-item__label) {
+  width: 120px !important;
+}
+</style>

@@ -36,6 +36,7 @@ const meta = computed(() => {
   background: #f9f9f9;
   height: 100%;
   width: 100%;
+  // overflow: hidden;
   display: flex;
   box-sizing: border-box;
   .layout-menu {
@@ -44,7 +45,7 @@ const meta = computed(() => {
     background-color: white;
   }
   .layout-content {
-    width: 100%;
+    width: calc(100% - 280px);
     height: 100%;
     box-sizing: border-box;
     padding: 20px;
@@ -56,7 +57,7 @@ const meta = computed(() => {
       padding-left: 10px;
     }
     .layout-content-right-form {
-      height: calc(100% - 40px);
+      height: calc(100% - 42px);
     }
   }
 }

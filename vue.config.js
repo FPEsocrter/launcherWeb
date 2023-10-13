@@ -8,8 +8,7 @@ module.exports = defineConfig({
   transpileDependencies: true,
   publicPath: './',
   devServer: {
-    host: '127.0.0.1',
-    port: 8081,
+    host: '192.168.199.92',
     hot: true
   },
   configureWebpack: {

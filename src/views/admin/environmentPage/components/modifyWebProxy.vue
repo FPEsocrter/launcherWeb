@@ -9,7 +9,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button-f type="primary" @click="hadnleFix(), (webproxyDig.dialog = false)">确定</el-button-f>
-        <el-button-f class="dialogCancelBtn" @click="webproxyDig.dialog = false">取消</el-button-f>
+        <el-button-f dts class="dialogCancelBtn" @click="webproxyDig.dialog = false">取消</el-button-f>
       </span>
     </template>
   </el-dialog>
@@ -17,6 +17,7 @@
 <script setup>
 import WebProxy from '@/views/admin/browser/components/WebProxy.vue'
 import { GetBrowserApi, FixBrowserApi } from '@/service/admin/browser'
+import { openMessageBox } from '@/utils/common'
 
 const props = defineProps({
   modelValue: {
@@ -39,19 +40,27 @@ const webProxyinfo = reactive({
   other: {}
 })
 const getBrowserInfo = () => {
-  GetBrowserApi({ id: webproxyDig.id, webProxy: true }).then((res) => {
-    Object.keys(webProxyinfo).forEach((key) => {
-      webProxyinfo[key] = res.data.webProxy[key]
+  GetBrowserApi({ id: webproxyDig.id, webProxy: true })
+    .then((res) => {
+      Object.keys(webProxyinfo).forEach((key) => {
+        webProxyinfo[key] = res.data.webProxy[key]
+      })
     })
-  })
+    .catch((error) => {
+      openMessageBox(error, 'error')
+    })
 }
 watch(() => webproxyDig.dialog, getBrowserInfo)
 
 const hadnleFix = () => {
   console.log(...refWebProxy.value.verifMsg)
-  FixBrowserApi({ id: webproxyDig.id, webProxy: webProxyinfo }).then(() => {
-    emit('submit')
-  })
+  FixBrowserApi({ id: webproxyDig.id, webProxy: webProxyinfo })
+    .then(() => {
+      emit('submit')
+    })
+    .catch((error) => {
+      openMessageBox(error, 'error')
+    })
 }
 </script>
 <style lang="scss" scoped>

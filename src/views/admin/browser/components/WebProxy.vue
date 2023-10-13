@@ -2,11 +2,11 @@
   <div>
     <div class="proxy-type">
       <el-form-item :label="'代理类型'">
-        <el-select-f v-model="webProxy.type" :items="webProxyType" :placeholder="'请选择'" />
+        <div class="proxy-type-css">
+          <el-select-f v-model="webProxy.type" :items="webProxyType" :placeholder="'请选择'" />
+          <el-button-f @click="handleCheck"> 检查网络 </el-button-f>
+        </div>
       </el-form-item>
-      <div class="config-check-btn">
-        <el-button-f @click="handleCheck"> 检查网络 </el-button-f>
-      </div>
     </div>
 
     <template v-if="webProxy.type != webProxyType.NO_PROXY">
@@ -81,16 +81,20 @@ const handleCheck = () => {
     }
   }
 
-  CheckNetWordkApi(webProxy).then((res) => {
-    if (res.statusCode != 200) {
-      return
-    }
-    ipInfo.showIp = true
-    ipInfo.ips = res.data.ips
-    ipInfo.countryCode = res.data.countryCode
-    ipInfo.region = res.data.region
-    ipInfo.city = res.data.city
-  })
+  CheckNetWordkApi(webProxy)
+    .then((res) => {
+      if (res.statusCode != 200) {
+        return
+      }
+      ipInfo.showIp = true
+      ipInfo.ips = res.data.ips
+      ipInfo.countryCode = res.data.countryCode
+      ipInfo.region = res.data.region
+      ipInfo.city = res.data.city
+    })
+    .catch((error) => {
+      openMessageBox(error, 'error')
+    })
 }
 let verifMsg = ref([])
 
@@ -145,3 +149,40 @@ defineExpose({
  * 外部修改  直接影响到内部的对象， 内部修改了， 直接影响到外部的对象
  */
 </script>
+<style lang="scss" scoped>
+.proxy-type-css {
+  display: flex;
+  width: 100%;
+  .el-select {
+    margin-right: 10px;
+  }
+}
+
+.config-check-text {
+  padding-left: 120px;
+  color: rgb(124, 201, 10);
+  p {
+    height: 18px;
+  }
+}
+
+:deep(.proxy-host-port) {
+  // 端口
+  .el-input__wrapper {
+    box-shadow: none;
+  }
+  .el-input-group__append {
+    padding: 0;
+    box-shadow: none;
+    background-color: transparent;
+  }
+  .el-form-item__content {
+    border: 1px solid #dadce2;
+    border-radius: 3px;
+  }
+}
+
+:deep(.el-form-item__label) {
+  width: 120px !important;
+}
+</style>

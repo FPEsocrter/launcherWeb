@@ -2,25 +2,28 @@
   <div class="browser-content">
     <div class="browser-title">导入配置</div>
     <div class="config-content">
-      <el-form class="form">
-        <el-collapse model-value="1">
-          <el-collapse-item title="环境信息" name="1">
-            <div class="config-form">
-              <environment v-model="val.environment" ref="refEnvironment" />
-            </div>
-          </el-collapse-item>
-          <el-collapse-item title="代理配置" name="2">
-            <div class="config-form">
-              <web-proxy v-model="val.webProxy" ref="refWebProxy" />
-            </div>
-          </el-collapse-item>
-          <el-collapse-item title="高级" name="3">
-            <div class="config-form">
-              <fingerprint v-model="val.fingerprint" ref="refFingerprint" />
-            </div>
-          </el-collapse-item>
-        </el-collapse>
-      </el-form>
+      <el-scrollbar>
+        <el-form class="form">
+          <el-collapse model-value="1">
+            <el-collapse-item title="环境信息" name="1">
+              <div class="config-form">
+                <environment v-model="val.environment" ref="refEnvironment" />
+              </div>
+            </el-collapse-item>
+            <el-collapse-item title="代理配置" name="2">
+              <div class="config-form">
+                <web-proxy v-model="val.webProxy" ref="refWebProxy" />
+              </div>
+            </el-collapse-item>
+            <el-collapse-item title="高级" name="3">
+              <div class="config-form">
+                <fingerprint v-model="val.fingerprint" ref="refFingerprint" />
+              </div>
+            </el-collapse-item>
+            <div class="config-empty"></div>
+          </el-collapse>
+        </el-form>
+      </el-scrollbar>
     </div>
     <div id=""></div>
     <div class="browser-bottom">
@@ -41,6 +44,8 @@ import Fingerprint from './components/Fingerprint.vue'
 import BrowserSynopsis from './components/BrowserSynopsis.vue'
 import { useRouter, useRoute } from 'vue-router'
 import { AddBrowserApi, GetBrowserApi, FixBrowserApi } from '@/service/admin/browser'
+import { openMessageBox } from '@/utils/common'
+
 const route = useRoute()
 const id = ref(route.query.id)
 const refEnvironment = ref('refEnvironment')
@@ -71,22 +76,30 @@ const verifMsg = () => {
 
 const handleDefine = () => {
   verifMsg()
-  AddBrowserApi(val).then((res) => {
-    if (res.statusCode != 200) {
-      return
-    }
-    router.go(-1)
-  })
+  AddBrowserApi(val)
+    .then((res) => {
+      if (res.statusCode != 200) {
+        return
+      }
+      router.go(-1)
+    })
+    .catch((error) => {
+      openMessageBox(error, 'error')
+    })
 }
 
 const handFix = () => {
   verifMsg()
-  FixBrowserApi({ id: id.value, ...val }).then((res) => {
-    if (res.statusCode != 200) {
-      return
-    }
-    router.go(-1)
-  })
+  FixBrowserApi({ id: id.value, ...val })
+    .then((res) => {
+      if (res.statusCode != 200) {
+        return
+      }
+      router.go(-1)
+    })
+    .catch((error) => {
+      openMessageBox(error, 'error')
+    })
 }
 
 const val = reactive({
@@ -129,22 +142,26 @@ const val = reactive({
 if (id.value == null) {
   val.environment.name = randName()
 } else if (id.value > 0) {
-  GetBrowserApi({ id: id.value }).then((res) => {
-    if (res.statusCode != 200) {
-      return
-    }
-    Object.keys(val.environment).forEach((key) => {
-      val.environment[key] = res.data.environment[key]
-    })
+  GetBrowserApi({ id: id.value })
+    .then((res) => {
+      if (res.statusCode != 200) {
+        return
+      }
+      Object.keys(val.environment).forEach((key) => {
+        val.environment[key] = res.data.environment[key]
+      })
 
-    Object.keys(val.webProxy).forEach((key) => {
-      val.webProxy[key] = res.data.webProxy[key]
-    })
+      Object.keys(val.webProxy).forEach((key) => {
+        val.webProxy[key] = res.data.webProxy[key]
+      })
 
-    Object.keys(val.fingerprint).forEach((key) => {
-      val.fingerprint[key] = res.data.fingerprint[key]
+      Object.keys(val.fingerprint).forEach((key) => {
+        val.fingerprint[key] = res.data.fingerprint[key]
+      })
     })
-  })
+    .catch((error) => {
+      openMessageBox(error, 'error')
+    })
 }
 
 defineExpose({
@@ -170,8 +187,9 @@ defineExpose({
   // 固定
   .browser-bottom {
     position: absolute;
-    bottom: 0;
+    bottom: -22px;
     left: 0;
+    z-index: 99;
     height: 60px;
     line-height: 60px;
     width: 100%;
@@ -195,5 +213,23 @@ defineExpose({
     width: 240px;
     border-radius: 8px;
   }
+}
+
+.config-content {
+  width: calc(100% - 250px);
+  height: 100%;
+  .el-form {
+    margin: 0 20px 0 0;
+  }
+  .config-form {
+    width: 70%;
+  }
+  .config-empty {
+    height: 60px;
+  }
+}
+
+.el-collapse div:nth-child(1) {
+  margin-top: 20px;
 }
 </style>
