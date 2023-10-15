@@ -40,25 +40,21 @@
                 </span>
                 <template #dropdown>
                   <el-dropdown-menu>
-                    <el-dropdown-item command="edit">
+                    <el-dropdown-item>
                       <el-button-f size="small" @click="hadnleModify(scope.row.id)">编辑</el-button-f>
                     </el-dropdown-item>
-                    <el-dropdown-item command="delete">
+                    <el-dropdown-item>
+                      <el-button-f size="small" @click=";(deleteInfo.dialog = true), (deleteInfo.ids = [scope.row.id])">删除</el-button-f>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
                       <el-button-f size="small" @click=";(webProxyDia.dialog = true), (webProxyDia.id = scope.row.id)">修改代理</el-button-f>
                     </el-dropdown-item>
-                    <el-dropdown-item command="fixAgent">
-                      <el-button-f size="small" @click=";(webProxyDia.dialog = true), (webProxyDia.id = scope.row.id)">修改代理</el-button-f>
-                    </el-dropdown-item>
-                    <el-dropdown-item command="fixPrint">
+                    <el-dropdown-item>
                       <el-button-f size="small" @click=";(fingerprintDia.dialog = true), (fingerprintDia.id = scope.row.id)">修改指纹</el-button-f>
                     </el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
-              <!-- <el-button-f @click=";(deleteInfo.dialog = true), (deleteInfo.ids = [scope.row.id])">删除</el-button-f>
-              <el-button-f @click=";(webProxyDia.dialog = true), (webProxyDia.id = scope.row.id)">修改代理</el-button-f>
-              <el-button-f @click=";(fingerprintDia.dialog = true), (fingerprintDia.id = scope.row.id)">修改指纹</el-button-f>
-              <el-button-f v-if="scope.row.open" @click="handleOpenBrowser(scope.row.id)">打开环境</el-button-f> -->
             </template>
           </el-table-column>
         </el-table>

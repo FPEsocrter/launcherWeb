@@ -12,12 +12,15 @@
         <router-view />
       </div>
     </div>
+    <!-- 帮助中心 -->
+    <support-center />
   </div>
 </template>
 <script setup>
 import ZlMenu from '@/views/layout/ZlMenu.vue'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import SupportCenter from './support/index.vue'
 
 const route = useRoute()
 
@@ -33,6 +36,7 @@ const meta = computed(() => {
 </script>
 <style lang="scss" scoped>
 .layout-admin {
+  position: relative;
   background: #f9f9f9;
   height: 100%;
   width: 100%;

@@ -1,6 +1,6 @@
 <template>
   <div class="cascade-btn">
-    <el-form-item label="时区1">
+    <el-form-item label="时区">
       <fs-cascade v-model="fingerprint.timeZone.type" :items="{ 0: '默认', 1: '本机', 3: '基于ip' }" />
     </el-form-item>
   </div>

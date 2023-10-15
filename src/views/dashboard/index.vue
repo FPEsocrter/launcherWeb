@@ -16,4 +16,4 @@
 <script setup>
 import ZlMenu from '@/views/layout/ZlMenu.vue'
 </script>
-<style></style>
+<style scoped></style>

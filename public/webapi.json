@@ -1,4 +1,4 @@
 {
     "PRODUCTION_URL":"http://121.4.69.84:8081",
-    "DEV_PRODUCTION_URL":"http://121.4.69.84:8082"
+    "DEV_PRODUCTION_URL":"http://121.4.69.84:8080"
 }

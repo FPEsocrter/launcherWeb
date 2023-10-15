@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3240657 */
-  src: url('iconfont.woff2?t=1695662301712') format('woff2'),
-       url('iconfont.woff?t=1695662301712') format('woff'),
-       url('iconfont.ttf?t=1695662301712') format('truetype');
+  src: url('iconfont.woff2?t=1697378672835') format('woff2'),
+       url('iconfont.woff?t=1697378672835') format('woff'),
+       url('iconfont.ttf?t=1697378672835') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,10 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-kefutubiao:before {
+  content: "\e609";
 }
 
 .icon-baocun:before {
@@ -112,15 +116,4 @@
 .icon-diannao:before {
   content: "\e626";
 }
-
-.randIcon:before {
-  content: '';
-  display: block;
-  width: 20px;
-  height: 20px;
-  background:url('~@/assets/images/svg/randsvg.svg');
-  background-size:cover;
-  filter: grayscale(100%);
-}
-
 
