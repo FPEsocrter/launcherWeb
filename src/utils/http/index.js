@@ -31,6 +31,9 @@ export class Http {
     this.loadingOptions = {
       text: httpConfig.loadingOptionsText
     }
+
+    // let configURL = ''
+
     this.instance = axios.create({
       baseURL,
       withCredentials: false, // 跨域携带 cookie
@@ -48,6 +51,10 @@ export class Http {
     // 请求拦截
     this.instance.interceptors.request.use(
       (config) => {
+        //local开头请求，访问本地地址
+        if (config.url.startsWith('/local')) {
+          config.url = window.location.origin + config.url
+        }
         // 是否开启加载页
         // const isOpenLoading = httpConfig.debounce.find((item) => checkStart(config.url, item))
         // // 开启全局 并且 当前请求不以[非loading页] 为开头
